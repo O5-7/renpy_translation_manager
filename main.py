@@ -1,3 +1,5 @@
+import os
+
 from RPY_manager import RPY_manager
 import flet as ft
 
@@ -25,7 +27,7 @@ def main(page: ft.Page):
                 ),
                 ft.WindowDragArea(
                     ft.Container(
-                        ft.Text("RPY Manager", color="#000000", size=30, offset=(0,-0.1)),
+                        ft.Text(os.getcwd(), color="#000000", size=30, offset=(0,-0.1)),
                         bgcolor="#FFFFFF",
                         height=40,
                     ),

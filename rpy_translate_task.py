@@ -2,7 +2,6 @@ import hashlib
 import time
 
 import flet as ft
-import os
 import json
 import datetime
 from text_editor import text_editor

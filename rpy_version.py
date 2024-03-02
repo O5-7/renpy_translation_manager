@@ -2,7 +2,6 @@ from rpy_file import RPY_File
 import flet as ft
 import os
 import datetime
-import time
 import json
 from rpy_translate_task import rpy_translation_task, date_format
 import hashlib

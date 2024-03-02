@@ -1,7 +1,6 @@
 import os
 import json
 import flet as ft
-from datasets import tqdm
 
 line_height = 23
 

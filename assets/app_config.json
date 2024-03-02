@@ -1,0 +1,12 @@
+{
+  "appid": "",
+  "appkey": "",
+  "user_name": "",
+  "task_auto_save": 20,
+  "game_path": "D:\\renpy_811\\renpy-8.1.1-sdk\\tutorial",
+  "default_versions": {
+    "0.35": "E:\\恋爱课程LessonsInLove0.29\\0.35",
+    "0.33": "E:\\恋爱课程LessonsInLove0.29\\0.33",
+    "0.32": "E:\\恋爱课程LessonsInLove0.29\\0.32"
+  }
+}

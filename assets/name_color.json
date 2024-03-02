@@ -1,0 +1,730 @@
+{
+  "a": [
+    "Ami",
+    "#ff4dd2"
+  ],
+  "ahead": [
+    "Ami (Headless)",
+    "#ff4dd2"
+  ],
+  "pink": [
+    "Pink",
+    "#ff4dd2"
+  ],
+  "m": [
+    "Maya",
+    "#18b500"
+  ],
+  "mayamaybe": [
+    "Maya Maybe",
+    "#18b500"
+  ],
+  "mightbemaya": [
+    "Might Be Maya",
+    "#18b500"
+  ],
+  "middlemaya": [
+    "Middle Maya",
+    "#18b500"
+  ],
+  "green": [
+    "Green",
+    "#18b500"
+  ],
+  "m2": [
+    "Maya 2",
+    "#18b500"
+  ],
+  "mi": [
+    "Miku",
+    "#ff8112"
+  ],
+  "s": [
+    "Sensei",
+    "#141414"
+  ],
+  "cat1": [
+    "Cat 1",
+    "#141414"
+  ],
+  "cat2": [
+    "Cat 2",
+    "#141414"
+  ],
+  "cat3": [
+    "Cat 3",
+    "#141414"
+  ],
+  "cat4": [
+    "Cat 4",
+    "#141414"
+  ],
+  "cat5": [
+    "Cat 5",
+    "#141414"
+  ],
+  "te": [
+    "Teacher",
+    "#141414"
+  ],
+  "doc": [
+    "Doctor",
+    "#141414"
+  ],
+  "legitmom": [
+    "Totally Legitimate Mother (Mary)",
+    "#141414"
+  ],
+  "jimmy": [
+    "Jimmy",
+    "#141414"
+  ],
+  "tako2": [
+    "Takoyaki Son, Son of Takoyaki Man",
+    "#141414"
+  ],
+  "fff": [
+    "Frank: Friend of Takoyaki Son, Son of Takoyaki Man",
+    "#141414"
+  ],
+  "se": [
+    "Sekai",
+    "#96001B"
+  ],
+  "red": [
+    "Red",
+    "#96001B"
+  ],
+  "sel": [
+    "Selebus",
+    "#96001B"
+  ],
+  "achoir": [
+    "A Choir of Angels",
+    "#141414"
+  ],
+  "mag": [
+    "Manny the Friendly Maggot",
+    "#141414"
+  ],
+  "sa": [
+    "Sana",
+    "#005730"
+  ],
+  "sal": [
+    "Sana With an Extra Eye",
+    "#005730"
+  ],
+  "f": [
+    "Futaba",
+    "#9326ff"
+  ],
+  "y": [
+    "Yumi",
+    "#d12e2e"
+  ],
+  "yak1": [
+    "Yakuza Dude",
+    "#d12e2e"
+  ],
+  "yak2": [
+    "Other Yakuza Dude",
+    "#d12e2e"
+  ],
+  "yak3": [
+    "Both Yakuza Dudes",
+    "#d12e2e"
+  ],
+  "c": [
+    "Chika",
+    "#AF7F00"
+  ],
+  "ay": [
+    "Ayane",
+    "#00bab1"
+  ],
+  "blue": [
+    "Blue",
+    "#00bab1"
+  ],
+  "r": [
+    "Rin",
+    "#a30041"
+  ],
+  "ri": [
+    "Rika",
+    "#D18E77"
+  ],
+  "mak": [
+    "Makoto",
+    "#3c55fa"
+  ],
+  "maki": [
+    "Maki",
+    "#3B84A9"
+  ],
+  "maid": [
+    "Maid",
+    "#AA4588"
+  ],
+  "u": [
+    "Uta",
+    "#AA4588"
+  ],
+  "n": [
+    "Noriko",
+    "#FF61A9"
+  ],
+  "na": [
+    "Nao",
+    "#602F2B"
+  ],
+  "nni": [
+    "Noriko & Niki",
+    "#FF61A9"
+  ],
+  "ni": [
+    "Niki",
+    "#FF0074"
+  ],
+  "w": [
+    "Wakana",
+    "#540087"
+  ],
+  "gg": [
+    "Guitar Girl",
+    "#B83A6A"
+  ],
+  "o": [
+    "Otoha",
+    "#B83A6A"
+  ],
+  "you": [
+    "You?",
+    "#141414"
+  ],
+  "q": [
+    "???",
+    "#1a1c1e"
+  ],
+  "limo": [
+    "Limo Driver",
+    "#1a1c1e"
+  ],
+  "pianoman": [
+    "Piano Man",
+    "#1a1c1e"
+  ],
+  "loungeguy": [
+    "Lounge Guy",
+    "#1a1c1e"
+  ],
+  "train": [
+    "Train Passenger",
+    "#1a1c1e"
+  ],
+  "ann": [
+    "Conductor",
+    "#1a1c1e"
+  ],
+  "anno": [
+    "Announcer",
+    "#1a1c1e"
+  ],
+  "nf1": [
+    "Nodoka Fan 1",
+    "#1a1c1e"
+  ],
+  "nf2": [
+    "Nodoka Fan 2",
+    "#1a1c1e"
+  ],
+  "nf3": [
+    "Nodoka Fan 3",
+    "#1a1c1e"
+  ],
+  "nf4": [
+    "Nodoka Fan 4",
+    "#1a1c1e"
+  ],
+  "nf5": [
+    "Nodoka Fan 5",
+    "#1a1c1e"
+  ],
+  "nf6": [
+    "Crowd of Nodoka Fans",
+    "#1a1c1e"
+  ],
+  "x": [
+    "今",
+    "#1a1c1e"
+  ],
+  "pmee": [
+    "Pretty Much Everyone Else",
+    "#1a1c1e"
+  ],
+  "futamak": [
+    "Futaba & Makoto",
+    "#1a1c1e"
+  ],
+  "chtk": [
+    "Chinami & Tsukasa",
+    "#1a1c1e"
+  ],
+  "bart": [
+    "Bartender",
+    "#1a1c1e"
+  ],
+  "cro1": [
+    "Crowd Member",
+    "#1a1c1e"
+  ],
+  "mysdol": [
+    "Mystery Dolphin",
+    "#1a1c1e"
+  ],
+  "riri": [
+    "Rika & Rin",
+    "#1a1c1e"
+  ],
+  "chikauta": [
+    "Chika & Uta",
+    "#1a1c1e"
+  ],
+  "ttitb": [
+    "The Tanuki in the Background",
+    "#1a1c1e"
+  ],
+  "libp": [
+    "Librarian",
+    "#1a1c1e"
+  ],
+  "vpa": [
+    "Voice Over PA",
+    "#1a1c1e"
+  ],
+  "storec": [
+    "Store Clerk",
+    "#1a1c1e"
+  ],
+  "eei": [
+    "Everyone Except Io",
+    "#1a1c1e"
+  ],
+  "rmo": [
+    "Random Market Stall Owner",
+    "#1a1c1e"
+  ],
+  "barista": [
+    "Barista Who Only Shows Up In This Event",
+    "#1a1c1e"
+  ],
+  "sre": [
+    "Smile Reminder",
+    "#1a1c1e"
+  ],
+  "tv": [
+    "TV Announcer",
+    "#1a1c1e"
+  ],
+  "ll": [
+    "Left Leg",
+    "#1a1c1e"
+  ],
+  "rl": [
+    "Right Leg",
+    "#1a1c1e"
+  ],
+  "ngk": [
+    "Net With Knife Nose & Melon Mouth",
+    "#1a1c1e"
+  ],
+  "sr": [
+    "Sensei & Rin",
+    "#1a1c1e"
+  ],
+  "kaay": [
+    "Karin & Ayane",
+    "#1a1c1e"
+  ],
+  "matt": [
+    "Matthew",
+    "#1a1c1e"
+  ],
+  "saraharuka": [
+    "Sara & Haruka",
+    "#1a1c1e"
+  ],
+  "uam": [
+    "Uta & Makoto",
+    "#1a1c1e"
+  ],
+  "nki": [
+    "Noriko & Kirin",
+    "#1a1c1e"
+  ],
+  "snc": [
+    "Some Nearby Cat",
+    "#1a1c1e"
+  ],
+  "taco": [
+    "Taco Man",
+    "#1a1c1e"
+  ],
+  "bg": [
+    "Book Guy",
+    "#1a1c1e"
+  ],
+  "di": [
+    "Director",
+    "#1a1c1e"
+  ],
+  "manager": [
+    "Manager",
+    "#1a1c1e"
+  ],
+  "watermelon": [
+    "Watermelon Sex Toy",
+    "#1a1c1e"
+  ],
+  "moyo": [
+    "Moyo",
+    "#18b500"
+  ],
+  "fv": [
+    "Familiar Voice",
+    "#1a1c1e"
+  ],
+  "ee": [
+    "Everyone, Everywhere",
+    "#1a1c1e"
+  ],
+  "nce": [
+    "Non Chika Employee",
+    "#1a1c1e"
+  ],
+  "ub": [
+    "Unnamed Baby",
+    "#1a1c1e"
+  ],
+  "foc": [
+    "Flock of Chickens",
+    "#1a1c1e"
+  ],
+  "do": [
+    "Dolphin",
+    "#1a1c1e"
+  ],
+  "yt": [
+    "Your Telephone",
+    "#1a1c1e"
+  ],
+  "nyt": [
+    "Not Your Telephone",
+    "#1a1c1e"
+  ],
+  "sky": [
+    "Sky",
+    "#1a1c1e"
+  ],
+  "pt": [
+    "Part Timer",
+    "#1a1c1e"
+  ],
+  "p1": [
+    "Plant #1",
+    "#1a1c1e"
+  ],
+  "p2": [
+    "Plant #2",
+    "#1a1c1e"
+  ],
+  "p3": [
+    "Plant #3",
+    "#1a1c1e"
+  ],
+  "p4": [
+    "Plant #4",
+    "#1a1c1e"
+  ],
+  "plant7": [
+    "Plant #7",
+    "#1a1c1e"
+  ],
+  "chair": [
+    "Chair",
+    "#1a1c1e"
+  ],
+  "maktouk": [
+    "Makoto & Touka (?)",
+    "#1a1c1e"
+  ],
+  "saki": [
+    "Saki",
+    "#A96CC7"
+  ],
+  "rg": [
+    "Ramen Girl",
+    "#C8B330"
+  ],
+  "ra": [
+    "Ramen?...",
+    "#C8B330"
+  ],
+  "t": [
+    "Tsuneyo",
+    "#C8B330"
+  ],
+  "tf": [
+    "Tsuneyo's Friend",
+    "#C8B330"
+  ],
+  "lt": [
+    "Librarian Thief",
+    "#AF89A2"
+  ],
+  "no": [
+    "Nodoka",
+    "#AF89A2"
+  ],
+  "noodles": [
+    "Noodles",
+    "#C8B330"
+  ],
+  "mo": [
+    "Molly",
+    "#4FCB80"
+  ],
+  "i": [
+    "Io",
+    "#BBE3A1"
+  ],
+  "ima": [
+    "Imani",
+    "#80C9DC"
+  ],
+  "mt": [
+    "Molly and Tsuneyo",
+    "#1a1c1e"
+  ],
+  "sao": [
+    "Sensei & Otoha",
+    "#1a1c1e"
+  ],
+  "mg": [
+    "Mystery Girl",
+    "#A96CC7"
+  ],
+  "yu": [
+    "Yuki",
+    "#CDCDCD"
+  ],
+  "oldl": [
+    "Old Lady",
+    "#1a1c1e"
+  ],
+  "om": [
+    "Old Man",
+    "#1a1c1e"
+  ],
+  "nr": [
+    "Not Rin",
+    "#1a1c1e"
+  ],
+  "wa": [
+    "Waitress",
+    "#1a1c1e"
+  ],
+  "k": [
+    "Kaori",
+    "#4B4B4B"
+  ],
+  "ya": [
+    "Yasu",
+    "#74d9e9"
+  ],
+  "yamom": [
+    "Yasu's Mother",
+    "#74d9e9"
+  ],
+  "cre": [
+    "Creatures",
+    "#74d9e9"
+  ],
+  "worm": [
+    "Wormwood",
+    "#74d9e9"
+  ],
+  "yom": [
+    "Yomiel",
+    "#74d9e9"
+  ],
+  "ahc": [
+    "A Huge Cock",
+    "#4B4B4B"
+  ],
+  "john": [
+    "John",
+    "#4B4B4B"
+  ],
+  "an": [
+    "An Angel",
+    "#FF9999"
+  ],
+  "ch": [
+    "Chinami",
+    "#FF9999"
+  ],
+  "chi": [
+    "Chiaki",
+    "#C99611"
+  ],
+  "chd": [
+    "Chinami (Dog Form)",
+    "#FF9999"
+  ],
+  "h": [
+    "Haruka",
+    "#B02E8C"
+  ],
+  "rlg": [
+    "Rich Looking Girl",
+    "#F0E68C"
+  ],
+  "to": [
+    "Touka",
+    "#F0E68C"
+  ],
+  "tb": [
+    "Tsubasa",
+    "#eae6aa"
+  ],
+  "tk": [
+    "Tsukasa",
+    "#f0ca8c"
+  ],
+  "forg": [
+    "Forgotten Customer",
+    "#1a1c1e"
+  ],
+  "cust": [
+    "Customer",
+    "#1a1c1e"
+  ],
+  "cussy1": [
+    "Customer 1",
+    "#1a1c1e"
+  ],
+  "cussy2": [
+    "Customer 2",
+    "#1a1c1e"
+  ],
+  "cussy3": [
+    "Customer 3",
+    "#1a1c1e"
+  ],
+  "cussy4": [
+    "Customer 4",
+    "#1a1c1e"
+  ],
+  "rand": [
+    "Random Karate Person",
+    "#1a1c1e"
+  ],
+  "rando": [
+    "Random Bypasser",
+    "#1a1c1e"
+  ],
+  "six": [
+    "61 6d 20 69 20 6f 6b 61 79",
+    "#1a1c1e"
+  ],
+  "seven": [
+    "73 65 6b 61 69",
+    "#1a1c1e"
+  ],
+  "sev": [
+    "79 6f 75 64 69 64 69 74",
+    "#1a1c1e"
+  ],
+  "a1": [
+    "Angel 1",
+    "#141414"
+  ],
+  "a2": [
+    "Angel 2",
+    "#141414"
+  ],
+  "a3": [
+    "Angels",
+    "#141414"
+  ],
+  "tdtl": [
+    "The Dark. The Light.",
+    "#141414"
+  ],
+  "ho": [
+    "HOPE",
+    "#FF1919"
+  ],
+  "six8": [
+    "68 6f 70 65",
+    "#FF1919"
+  ],
+  "av": [
+    "A Voice from Far Away",
+    "#1a1c1e"
+  ],
+  "sar": [
+    "Sara",
+    "#365D4C"
+  ],
+  "sg": [
+    "Soccer Girl",
+    "#1a1c1e"
+  ],
+  "sg2": [
+    "Soccer Girl 2",
+    "#1a1c1e"
+  ],
+  "sg3": [
+    "Strange Girl",
+    "#FFFFFF"
+  ],
+  "ka": [
+    "Karin",
+    "#AC9D77"
+  ],
+  "ki": [
+    "Kirin",
+    "#9C8080"
+  ],
+  "seinfeld": [
+    "Professional Comedian, Jerry Seinfeld",
+    "#9C8080"
+  ],
+  "c1": [
+    "Regular Customer",
+    "#1a1c1e"
+  ],
+  "c2": [
+    "Older Customer",
+    "#1a1c1e"
+  ],
+  "tod": [
+    "Todd the Chicken",
+    "#00bab1"
+  ],
+  "kin": [
+    "Karate Instructor",
+    "#9A6BA1"
+  ],
+  "os": [
+    "Osako",
+    "#9A6BA1"
+  ],
+  "amy": [
+    "Amy",
+    "#ff4dd2"
+  ]
+}

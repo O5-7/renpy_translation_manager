@@ -118,7 +118,7 @@ class text_editor:
             if "trans_result" in cost_target.keys():
                 target = cost_target["trans_result"][0]["dst"]
             else:
-                target = cost_target["error_msg"]
+                target = "错误"
 
         self.control.content.controls[3].controls[0].value = target
         self.control.content.controls[3].controls[0].update()
@@ -145,6 +145,9 @@ class text_editor:
     def translate_cost(self, query):
         appid = self.Rm.app_config["appid"]
         appkey = self.Rm.app_config["appkey"]
+
+        if appid == "" or appkey == "":
+            return {}
 
         from_lang = 'auto'
         to_lang = 'zh'

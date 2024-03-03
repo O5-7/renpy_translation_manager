@@ -300,8 +300,8 @@ class RPY_manager(ft.UserControl):
             ]
         )
 
-        self.transfer_dialog = ft.AlertDialog(
-            title=ft.Text("转移翻译", size=20),
+        self.t2j_transfer_dialog = ft.AlertDialog(
+            title=ft.Text("转移任务翻译", size=20),
             actions=[
                 ft.Column(
                     [
@@ -319,6 +319,39 @@ class RPY_manager(ft.UserControl):
                     width=600,
                 ),
             ]
+        )
+
+        self.v2v_transfer_dialog = ft.AlertDialog(
+            title=ft.Text("版本翻译转移", size=20),
+            actions=[
+                ft.Column(
+                    [
+                        ft.Row(
+                            [
+                                ft.Dropdown(width=230),
+                                ft.Icon(ft.icons.ARROW_FORWARD_ROUNDED),
+                                ft.Dropdown(width=230),
+                            ]
+                        ),
+                        ft.Row(
+                            [
+                                ft.TextButton(
+                                    icon=ft.icons.CHECK_ROUNDED,
+                                    text="转移",
+                                    on_click=self.transfer_version_translation
+                                ),
+                                ft.Checkbox(
+                                    label="覆盖",
+                                    value=False
+                                )
+                            ]
+                        ),
+                        ft.ProgressBar(width=510, height=20)
+                    ],
+                    spacing=5,
+                    width=500
+                ),
+            ],
         )
 
     def build(self):
@@ -392,17 +425,15 @@ class RPY_manager(ft.UserControl):
                             ft.IconButton(
                                 ft.icons.COMPARE_ARROWS_ROUNDED,
                                 icon_size=30,
-                                # icon_color="#83EBAC",
-                                icon_color="#a7a7a7",
+                                icon_color="#83EBAC",
                                 style=ft.ButtonStyle(
                                     shape={
                                         ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0),
                                     }
                                 ),
                                 offset=(0, 1),
-                                tooltip="对比 哈哈 还没做",
-                                disabled=True
-                                # TODO: 对比
+                                tooltip="转移翻译",
+                                on_click=self.open_v2v_transfer_dialog
                             ),
                             ft.IconButton(
                                 ft.icons.REFRESH_ROUNDED,
@@ -415,7 +446,7 @@ class RPY_manager(ft.UserControl):
                                     }
                                 ),
                                 offset=(1, 1),
-                                tooltip="刷新 哈哈 摆了",
+                                tooltip="刷新 未实现",
                                 disabled=True
                                 # TODO: 刷新
                             ),
@@ -520,7 +551,7 @@ class RPY_manager(ft.UserControl):
                                             ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0),
                                         }
                                     ),
-                                    on_click=self.open_transfer,
+                                    on_click=self.open_t2j_transfer_dialog,
                                     tooltip="提交任务"
                                 ),
                                 ft.IconButton(
@@ -996,11 +1027,11 @@ class RPY_manager(ft.UserControl):
         self.setting_config_dialog.open = True
         self.page.update()
 
-    def open_transfer(self, e):
+    def open_t2j_transfer_dialog(self, e):
         if self.selected_version == "":
             return
         rpy_dict = self.version_list[self.selected_version].rpy_dict
-        transfer_Column = self.transfer_dialog.actions[0].controls[0]
+        transfer_Column = self.t2j_transfer_dialog.actions[0].controls[0]
         transfer_Column.controls = []
 
         for task_hex, task in self.version_list[self.selected_version].tasks_dict.items():
@@ -1050,12 +1081,12 @@ class RPY_manager(ft.UserControl):
 
             )
 
-        self.page.dialog = self.transfer_dialog
-        self.transfer_dialog.open = True
+        self.page.dialog = self.t2j_transfer_dialog
+        self.t2j_transfer_dialog.open = True
         self.page.update()
 
     def move_task_result_to_json_file(self, e):
-        check_boxes_column = self.transfer_dialog.actions[0].controls[0]
+        check_boxes_column = self.t2j_transfer_dialog.actions[0].controls[0]
         ver_obj = self.version_list[self.selected_version]
         update_rpy_set = set()
         for row in check_boxes_column.controls:
@@ -1083,7 +1114,73 @@ class RPY_manager(ft.UserControl):
             rpy_obj.showing_type = ""
             rpy_obj.write_json(os.path.join(self.version_list[self.selected_version].folder_path))
 
-        self.transfer_dialog.open = False
+        self.t2j_transfer_dialog.open = False
+        self.page.update()
+
+    def open_v2v_transfer_dialog(self, e):
+        self.v2v_transfer_dialog.actions[0].controls[1].visible = True
+        self.v2v_transfer_dialog.actions[0].controls[2].visible = False
+
+        dropdown_row = self.v2v_transfer_dialog.actions[0].controls[0]
+        dropdown_row.controls[0].options = [ft.dropdown.Option(version_name) for version_name in self.version_list.keys()]
+        dropdown_row.controls[2].options = [ft.dropdown.Option(version_name) for version_name in self.version_list.keys()]
+
+        self.page.dialog = self.v2v_transfer_dialog
+        self.v2v_transfer_dialog.open = True
+        self.page.update()
+
+    def transfer_version_translation(self, e):
+        is_cover = self.v2v_transfer_dialog.actions[0].controls[1].controls[1].value
+
+        dropdown_row = self.v2v_transfer_dialog.actions[0].controls[0]
+        old_version_name = dropdown_row.controls[0].value
+        new_version_name = dropdown_row.controls[2].value
+        if old_version_name == new_version_name or old_version_name == "" or new_version_name == "":
+            return
+
+        self.v2v_transfer_dialog.actions[0].controls[1].visible = False
+        self.v2v_transfer_dialog.actions[0].controls[2].visible = True
+        self.v2v_transfer_dialog.update()
+        pb = self.v2v_transfer_dialog.actions[0].controls[2]
+
+        for num, (rpy_name, old_rpy_obj) in enumerate(self.version_list[old_version_name].rpy_dict.items()):
+            pb.value = num / len(self.version_list[old_version_name].rpy_dict)
+            pb.update()
+            if rpy_name in self.version_list[new_version_name].rpy_dict.keys():  # 是否包含文件
+                new_rpy_obj = self.version_list[new_version_name].rpy_dict[rpy_name]
+                new_rpy_obj.json_info_value = ""
+                new_rpy_obj.rpy_info_value = ""
+                new_rpy_obj.line_num = {
+                    "rpy": 0,
+                    "json": 0
+                }
+                new_rpy_obj.showing_type = ""
+
+                for event_name, dialogues in old_rpy_obj.file_json['dialogue'].items():
+                    if event_name in new_rpy_obj.file_json["dialogue"].keys():  # 是否包含事件
+                        for dialogue_hex, dialogue in dialogues.items():
+                            if dialogue_hex in self.version_list[new_version_name].rpy_dict[rpy_name].file_json["dialogue"][event_name].keys():  # 是否包含对话
+                                target_dialogue = self.version_list[new_version_name].rpy_dict[rpy_name].file_json["dialogue"][event_name][dialogue_hex]
+                                if is_cover or target_dialogue["translation"] == "":
+                                    target_dialogue.update({"translation": dialogue["translation"]})
+
+                for old_strings in old_rpy_obj.file_json['strings']:
+                    for old_string in old_strings:
+                        for new_strings in new_rpy_obj.file_json['strings']:
+                            for new_string in new_strings:
+                                if old_string["old"] == new_string["old"]:
+                                    if new_string["new"] == "" or is_cover:
+                                        new_string["new"] = old_string["new"]
+
+                new_rpy_obj.write_json(self.version_list[new_version_name].folder_path)
+
+        self.main_page.controls[3] = ft.Container(
+            ft.Container(width=1060, height=890, bgcolor="#eeeeee"),
+            border_radius=5,
+            border=ft.border.all(5, "#ff7f00")
+        )
+
+        self.v2v_transfer_dialog.open = False
         self.page.update()
 
     def save_setting_config(self, e):

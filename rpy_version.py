@@ -73,7 +73,7 @@ class rpy_version:
             content=ft.Container(
                 content=ft.Column(
                     [
-                        ft.Text(f'{self.version}', size=24, weight=ft.FontWeight.BOLD, color="#2a573b"),
+                        ft.Text(f'{self.version}', size=24 if len(self.version) <= 4 else 12, weight=ft.FontWeight.BOLD, color="#2a573b"),
                         ft.Text(f"文件:{len(self.rpy_dict)}", color="#2a573b", size=15),
                         ft.Text(f"任务:{len(self.tasks_dict)}", color="#2a573b", size=15),
                     ],

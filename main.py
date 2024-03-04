@@ -2,19 +2,22 @@ import os
 
 from RPY_manager import RPY_manager
 import flet as ft
+from running_log import running_log
 
 
 def main(page: ft.Page):
+    running_log("启动 RPY_manager")
     page.window_title_bar_hidden = True
     page.window_title_bar_buttons_hidden = True
 
-    def minimize(e):
+    def minimize(_):
         page.window_minimized = True
         page.update()
 
-    def close(e):
-        page.window_close()
+    def close_app(_):
+        running_log("关闭")
         page.controls[1].save_app_config()
+        page.window_close()
 
     page.add(
         ft.Row(
@@ -27,7 +30,7 @@ def main(page: ft.Page):
                 ),
                 ft.WindowDragArea(
                     ft.Container(
-                        ft.Text(os.getcwd(), color="#000000", size=30, offset=(0,-0.1)),
+                        ft.Text(os.getcwd(), color="#000000", size=30, offset=(0, -0.1)),
                         bgcolor="#FFFFFF",
                         height=40,
                     ),
@@ -47,7 +50,7 @@ def main(page: ft.Page):
                 ft.IconButton(
                     ft.icons.CLOSE,
                     icon_color="#e00a00",
-                    on_click=close,
+                    on_click=close_app,
                     style=ft.ButtonStyle(
                         shape={
                             ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0),
@@ -72,6 +75,8 @@ def main(page: ft.Page):
 
     page.controls[1].load_config()
     page.update()
+    running_log("启动成功")
 
 
+running_log("程序入口")
 ft.app(target=main)

@@ -1,4 +1,4 @@
-# Renpy translation mannager
+# Renpy translation manager
 
 ---
 *基于[`flet`](https://github.com/flet-dev/flet)的`.rpy`人工翻译润色桌面软件,实现创建翻译任务和分配*

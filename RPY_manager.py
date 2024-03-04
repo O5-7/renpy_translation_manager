@@ -1,6 +1,5 @@
 import hashlib
 
-from rpy_file import RPY_File
 from rpy_version import rpy_version
 import flet as ft
 import time
@@ -8,6 +7,7 @@ import datetime
 import json
 import os
 from rpy_translate_task import date_format, rpy_translation_task
+from running_log import running_log
 
 
 class RPY_manager(ft.UserControl):
@@ -22,11 +22,9 @@ class RPY_manager(ft.UserControl):
         self.selected_task = ''
         self.user_name = ''
 
-        """
-        version文件夹选择
-        """
-
         def filepicker_path_to_version_dialog(e: ft.FilePickerResultEvent):
+            if e.path is None:
+                return
             Column_controls = self.version_add_dialog.actions[0].content.controls
             Column_controls[0].controls[0].value = e.path
             Column_controls[0].controls[0].update()
@@ -58,18 +56,19 @@ class RPY_manager(ft.UserControl):
             e.update()
             Column_controls[2].controls[0].update()
 
-        def update_version_UI_list(e):
+        def update_version_UI_list(_):
             self.main_page.controls[1].content.controls[1].controls = [version.control for version in self.version_list.values()]
             self.main_page.controls[1].content.controls[1].update()
 
         self.update_version_UI_list = update_version_UI_list
 
-        def add_version(e):
+        def add_version(_):
             Column_controls = self.version_add_dialog.actions[0].content.controls
             path = Column_controls[0].controls[0].value
             if not os.path.isdir(path):
                 return
             name = Column_controls[1].value
+            running_log(f"添加version {name}", self)
             self.version_list.update({name: rpy_version(path, name, self), })
             self.version_list = {k: self.version_list[k] for k in sorted(self.version_list, reverse=True)}
             update_version_UI_list(None)
@@ -81,7 +80,7 @@ class RPY_manager(ft.UserControl):
                 self.app_config["default_versions"].update({version_name: version_obj.folder_path})
             self.save_app_config()
 
-        def close_version_add_dialog(e):
+        def close_version_add_dialog(_):
             self.version_add_dialog.open = False
             self.version_add_dialog.update()
 
@@ -119,7 +118,6 @@ class RPY_manager(ft.UserControl):
                             )
                         ]
                     ),
-                    height=300,
                     width=500,
                 )
             ]
@@ -139,7 +137,7 @@ class RPY_manager(ft.UserControl):
                         ft.TextButton(
                             icon=ft.icons.CHECK_ROUNDED,
                             text="确认删除",
-                            on_click=self.delete_dialog
+                            on_click=self.delete_version_dialog
                         )
                     ]
                 )
@@ -354,6 +352,11 @@ class RPY_manager(ft.UserControl):
             ],
         )
 
+    def close_app(self, _):
+        running_log("关闭")
+        self.page.controls[1].save_app_config()
+        self.page.window_close()
+
     def build(self):
         Setting_column = ft.Column(
             [
@@ -367,7 +370,8 @@ class RPY_manager(ft.UserControl):
                                 shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=5)},
                                 bgcolor={ft.MaterialState.DEFAULT: "#71363c"},
                             ),
-                            on_click=self.open_setting_config
+                            on_click=self.open_setting_config,
+                            tooltip="设置"
                         ),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -382,7 +386,8 @@ class RPY_manager(ft.UserControl):
                                 shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=5)},
                                 bgcolor={ft.MaterialState.DEFAULT: "#71363c"},
                             ),
-                            on_click=lambda _: self.page.window_close()
+                            on_click=self.close_app,
+                            tooltip="退出"
                         ),
                     ],
                 ),
@@ -483,20 +488,25 @@ class RPY_manager(ft.UserControl):
                                 ),
                                 ft.PopupMenuButton(
                                     items=[
-                                        ft.PopupMenuItem(icon=ft.icons.SAVE_AS_ROUNDED, text="另存为"),
-                                        # TODO: 另存为
-                                        ft.PopupMenuItem(),
+                                        ft.PopupMenuItem(
+                                            content=ft.Text(
+                                                value="谨慎操作",
+                                                color="#FF0000",
+                                                size=20
+                                            ),
+                                        ),
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_FORWARD_IOS_ROUNDED,
                                             text="json到rpy",
                                             on_click=lambda _: self.version_list[self.selected_version].json_2_rpy()
                                         ),
+                                        ft.PopupMenuItem(),
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_BACK_IOS_ROUNDED,
                                             text="rpy到json",
                                             on_click=lambda _: self.version_list[self.selected_version].rpy_2_json()
                                         ),
-                                        ft.FilePicker()
+                                        # ft.FilePicker()
                                     ],
                                     content=ft.Icon(
                                         name=ft.icons.MENU_ROUNDED,
@@ -646,12 +656,12 @@ class RPY_manager(ft.UserControl):
 
         return self.main_page
 
-    def open_version_folder_pick(self, e):
+    def open_version_folder_pick(self, _):
         self.page.dialog = self.version_add_dialog
         self.version_add_dialog.open = True
         self.page.update()
 
-    def open_delete_version_dialog(self, e):
+    def open_delete_version_dialog(self, _):
         checkbox_Column = self.version_delete_dialog.actions[0].controls[0]
         for version_name, version_obj in self.version_list.items():
             checkbox_Column.controls.append(
@@ -670,12 +680,13 @@ class RPY_manager(ft.UserControl):
         self.version_delete_dialog.open = True
         self.page.update()
 
-    def delete_dialog(self, e):
+    def delete_version_dialog(self, _):
         checkbox_Column = self.version_delete_dialog.actions[0].controls[0]
         for Row in checkbox_Column.controls:
             checkbox, version_name_text, _, _ = Row.controls
             if checkbox.value:
                 version_name = version_name_text.value
+                running_log(f"删除version {version_name}", self)
                 del self.version_list[version_name]
 
         self.version_list = {k: self.version_list[k] for k in sorted(self.version_list, reverse=True)}
@@ -689,7 +700,7 @@ class RPY_manager(ft.UserControl):
         self.version_delete_dialog.open = False
         self.page.update()
 
-    def open_add_task(self, e):
+    def open_add_task(self, _):
         if self.selected_version == "":
             return
         rpy_file_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[1]
@@ -704,7 +715,7 @@ class RPY_manager(ft.UserControl):
         self.add_task_dialog.open = True
         self.page.update()
 
-    def update_event_dropdown(self, e):
+    def update_event_dropdown(self, _):
         rpy_file_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[1]
         event_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[2]
         selected_rpy_file = rpy_file_dropdown.value
@@ -712,7 +723,7 @@ class RPY_manager(ft.UserControl):
         event_dropdown.options.append(ft.dropdown.Option("strings"))
         event_dropdown.update()
 
-    def update_dialogue_dropdown(self, e):
+    def update_dialogue_dropdown(self, _):
         rpy_file_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[1]
         event_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[2]
         dialogue_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[3]
@@ -737,11 +748,7 @@ class RPY_manager(ft.UserControl):
                     )
         dialogue_dropdown.update()
 
-    # def add_version(self, dir_path: str, version: str):
-    #     rpy_v_obj = rpy_version(dir_path, version)
-    #     self.version_list.update({version: {'dir_path': dir_path, 'rpy': rpy_v_obj}})
-
-    def check_task_description(self, e):
+    def check_task_description(self, _):
         task_description_textfield = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[4]
         if task_description_textfield.value.find("@") != -1:
             task_description_textfield.error_text = "不要包含@"
@@ -749,12 +756,13 @@ class RPY_manager(ft.UserControl):
             task_description_textfield.error_text = ""
         task_description_textfield.update()
 
-    def add_modify_task(self, e):
+    def add_modify_task(self, _):
         add_modify_task_3_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls
         rpy_file_name = add_modify_task_3_dropdown[1].value
         event_name = add_modify_task_3_dropdown[2].value
         dialogue_name = add_modify_task_3_dropdown[3].value[:8]
         description = add_modify_task_3_dropdown[4].value
+        running_log(f"添加润色任务 {description}", self)
 
         if not all([rpy_file_name, event_name, dialogue_name, description]):
             return
@@ -804,13 +812,8 @@ class RPY_manager(ft.UserControl):
         self.add_task_dialog.open = False
         self.add_task_dialog.update()
 
-    def add_update_task(self, e):
-        """
-        按下按钮后添加更新任务
-        :param e:
-        :return:
-        """
-
+    def add_update_task(self, _):
+        running_log("添加更新任务", self)
         tasks_dick = self.version_list[self.selected_version].tasks_dict
 
         task_info = self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[4].value
@@ -818,7 +821,8 @@ class RPY_manager(ft.UserControl):
         if task_info is None:
             return
         task_info: str
-        new_file, new_event, modify_line, new_or_modify_string = task_info.split("%")
+        print(task_info)
+        new_file, new_event, modify_line, new_or_modify_string = task_info.split("[%split^]")
 
         new_file = eval(new_file)
         new_event = eval(new_event)
@@ -952,7 +956,8 @@ class RPY_manager(ft.UserControl):
         self.add_task_dialog.open = False
         self.add_task_dialog.update()
 
-    def update_task_info(self, e):
+    def update_task_info(self, _):
+        running_log("计算更新内容", self)
         add_update_task_Column = self.add_task_dialog.actions[0].content.controls[0].tabs[1].content
         old_version = add_update_task_Column.controls[1].controls[0].value
         new_version = add_update_task_Column.controls[1].controls[1].value
@@ -989,11 +994,12 @@ class RPY_manager(ft.UserControl):
         hint_text_4 = f"更新或增加的string:{sum([len(v) for k, v in modify_or_new_strings.items()])}:\n" + "\n".join([f"{k}:{v}" for k, v in modify_or_new_strings.items()])
 
         self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[3].controls[0].value = '\n'.join(['```python', hint_text_1, hint_text_2, hint_text_3, hint_text_4, '```'])
-        self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[4].value = "%".join([f"{new_file}", f"{new_event}", f"{change_line}", f"{modify_or_new_strings}"])
+        self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[4].value = "[%split^]".join([f"{new_file}", f"{new_event}", f"{change_line}", f"{modify_or_new_strings}"])
         self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[3].controls[0].update()
         self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[4].update()
 
     def save_app_config(self):
+        running_log("保存设置到本地")
         with open('assets/app_config.json', mode='w', encoding='utf-8') as F:
             F.write(json.dumps(self.app_config, indent=2, ensure_ascii=False))
 
@@ -1017,7 +1023,7 @@ class RPY_manager(ft.UserControl):
             self.version_list.update({name: rpy_version(path, name, self)})
             self.update_version_UI_list(None)
 
-    def open_setting_config(self, e):
+    def open_setting_config(self, _):
         self.setting_config_dialog.actions[0].content.controls[0].controls[1].value = self.app_config["user_name"]
         self.setting_config_dialog.actions[0].content.controls[1].controls[1].value = str(self.app_config["task_auto_save"])
         self.setting_config_dialog.actions[0].content.controls[2].controls[1].value = str(self.app_config["game_path"])
@@ -1027,7 +1033,7 @@ class RPY_manager(ft.UserControl):
         self.setting_config_dialog.open = True
         self.page.update()
 
-    def open_t2j_transfer_dialog(self, e):
+    def open_t2j_transfer_dialog(self, _):
         if self.selected_version == "":
             return
         rpy_dict = self.version_list[self.selected_version].rpy_dict
@@ -1055,7 +1061,6 @@ class RPY_manager(ft.UserControl):
 
             description: str = task.description
 
-            label = description.ljust(50) + str(int(acc * 10000) / 100).rjust(5) + "%"
             transfer_Column.controls.append(
                 ft.Row(
                     [
@@ -1085,7 +1090,8 @@ class RPY_manager(ft.UserControl):
         self.t2j_transfer_dialog.open = True
         self.page.update()
 
-    def move_task_result_to_json_file(self, e):
+    def move_task_result_to_json_file(self, _):
+        running_log("转移任务翻译到json", self)
         check_boxes_column = self.t2j_transfer_dialog.actions[0].controls[0]
         ver_obj = self.version_list[self.selected_version]
         update_rpy_set = set()
@@ -1117,7 +1123,7 @@ class RPY_manager(ft.UserControl):
         self.t2j_transfer_dialog.open = False
         self.page.update()
 
-    def open_v2v_transfer_dialog(self, e):
+    def open_v2v_transfer_dialog(self, _):
         self.v2v_transfer_dialog.actions[0].controls[1].visible = True
         self.v2v_transfer_dialog.actions[0].controls[2].visible = False
 
@@ -1129,15 +1135,16 @@ class RPY_manager(ft.UserControl):
         self.v2v_transfer_dialog.open = True
         self.page.update()
 
-    def transfer_version_translation(self, e):
+    def transfer_version_translation(self, _):
         is_cover = self.v2v_transfer_dialog.actions[0].controls[1].controls[1].value
 
         dropdown_row = self.v2v_transfer_dialog.actions[0].controls[0]
         old_version_name = dropdown_row.controls[0].value
         new_version_name = dropdown_row.controls[2].value
+
         if old_version_name == new_version_name or old_version_name == "" or new_version_name == "":
             return
-
+        running_log(f"转移翻译 {old_version_name} 到 {new_version_name}", self)
         self.v2v_transfer_dialog.actions[0].controls[1].visible = False
         self.v2v_transfer_dialog.actions[0].controls[2].visible = True
         self.v2v_transfer_dialog.update()
@@ -1183,7 +1190,8 @@ class RPY_manager(ft.UserControl):
         self.v2v_transfer_dialog.open = False
         self.page.update()
 
-    def save_setting_config(self, e):
+    def save_setting_config(self, _):
+        running_log("保存设置", self)
         self.app_config["user_name"] = self.setting_config_dialog.actions[0].content.controls[0].controls[1].value
         try:
             self.app_config["task_auto_save"] = int(self.setting_config_dialog.actions[0].content.controls[1].controls[1].value)

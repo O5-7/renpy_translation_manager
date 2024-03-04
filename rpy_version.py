@@ -5,6 +5,7 @@ import datetime
 import json
 from rpy_translate_task import rpy_translation_task, date_format
 import hashlib
+from running_log import running_log
 
 
 class rpy_version:
@@ -40,7 +41,8 @@ class rpy_version:
     def update_control(self):
         self.control = self.build_control()
 
-    def switch_files_and_tasks_column(self, e):
+    def switch_files_and_tasks_column(self, _):
+        running_log(f"打开version {self.version}", self.Rm)
         self.Rm.selected_version = self.version
         self.Rm.selected_task = ""
         self.Rm.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.version}"
@@ -93,6 +95,7 @@ class rpy_version:
         return rpy_v_control
 
     def init_running_file(self):
+        running_log(f"初始化文件 {self.version} {self.folder_path}", self.Rm)
         self.config.update({'version': self.version})
         file_name_list = [file_name[:-4] for file_name in os.listdir(self.folder_path) if file_name.endswith('.rpy')]
         self.config.update({"file_name_list": file_name_list})
@@ -127,29 +130,34 @@ class rpy_version:
         return os.path.isfile(os.path.join(self.folder_path, 'config.json'))
 
     def read_rpy_by_rpy(self):
+        running_log(f"读取rpys {self.version}", self.Rm)
         self.rpy_dict = {}
         for file_name in self.config['file_name_list']:
             rpy = RPY_File(os.path.join(self.folder_path, file_name + '.rpy'), self.Rm)
             self.rpy_dict.update({file_name: rpy})
 
     def read_rpy_by_json(self):
+        running_log(f"读取jsons {self.version}", self.Rm)
         self.rpy_dict = {}
         for file_name in self.config['file_name_list']:
             rpy = RPY_File(os.path.join(self.folder_path, file_name + '.json'), self.Rm)
             self.rpy_dict.update({file_name: rpy})
 
     def rpy_2_json(self):
+        running_log(f"rpy转移到json {self.version}", self.Rm)
         self.read_rpy_by_rpy()
         for rpy_obj in self.rpy_dict.values():
             rpy_obj.write_json(self.folder_path)
         self.switch_files_and_tasks_column(None)
 
     def json_2_rpy(self):
+        running_log(f"json转移到rpy {self.version}", self.Rm)
         self.read_rpy_by_json()
         for rpy_obj in self.rpy_dict.values():
             rpy_obj.write_rpy(self.folder_path)
 
     def scan_tasks(self) -> str:
+        running_log(f"扫描tasks {self.version}", self.Rm)
         tasks_folder_path = os.path.join(self.folder_path, 'tasks')
         if not os.path.isdir(tasks_folder_path):
             return 'no_such_tasks'
@@ -185,9 +193,3 @@ class rpy_version:
 
             self.tasks_dict.update({task_hex: task_obj})
         return 'success'
-
-
-if __name__ == '__main__':
-    v = rpy_version('./0.33', version='0.33')
-    print(v.finish_acc())
-    print(v.tasks_dict['1234234'].host_name)

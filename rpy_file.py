@@ -1,6 +1,7 @@
 import os
 import json
 import flet as ft
+from running_log import running_log
 
 line_height = 23
 
@@ -43,7 +44,7 @@ class RPY_File:
         self.control = self.build_control()
 
     def read_rpy(self):
-        lines = []
+        running_log(f"读取rpy: {self.file_name}", self.Rm)
         with open(self.file_path, mode='r', encoding='utf-8') as F:
             lines = F.readlines()
         clear_lines = []
@@ -67,8 +68,6 @@ class RPY_File:
             if strings_start < 0 and line.endswith('strings:\n'):
                 strings_start = clear_lines_len - 1
 
-        dialogue_lines = []
-        string_lines = []
         if strings_start == -1:
             dialogue_lines = clear_lines
             string_lines = []
@@ -130,15 +129,18 @@ class RPY_File:
                 string_index += 3
 
     def read_json(self):
+        # running_log(f"读取json {self.file_name}", self.Rm)
         with open(self.file_path, mode='r', encoding='utf-8') as F:
             self.file_json = json.load(F)
 
     def write_json(self, folder_path: str):
+        running_log(f"写json {self.file_name} 在 {folder_path}", self.Rm)
         json_str = json.dumps(self.file_json, indent=2, ensure_ascii=False)
         with open(os.path.join(folder_path, self.file_json['name'] + '.json'), mode='w', encoding='utf-8') as F:
             F.write(json_str)
 
     def write_rpy(self, folder_path: str):
+        running_log(f"写rpy {self.file_name} 在 {folder_path}", self.Rm)
         write_str = ''
         with open(os.path.join(folder_path, self.file_json['name'] + '.rpy'), mode='w', encoding='utf-8') as F:
             for event, lines in self.file_json['dialogue'].items():
@@ -191,7 +193,8 @@ class RPY_File:
 
         return rpy_file_control
 
-    def show_file_info(self, e):
+    def show_file_info(self, _):
+        running_log(f"打开rpy {self.file_name}", self.Rm)
         self.Rm.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.Rm.selected_version} >> {self.file_name}"
         self.Rm.page.controls[0].controls[1].content.content.update()
 
@@ -301,7 +304,7 @@ class RPY_File:
 
         text_con.update()
 
-    def update_json_txt(self, pb=None):
+    def update_json_txt(self):
         self.json_info_value = json.dumps(self.file_json, indent=4, ensure_ascii=False)
         self.line_num["json"] = len(self.json_info_value.split('\n'))
 
@@ -347,7 +350,7 @@ class RPY_File:
 
         self.line_num["rpy"] = len(self.rpy_info_value.split('\n'))
 
-    def switch_to_json_info(self, e):
+    def switch_to_json_info(self, _):
         if self.json_info_value == "":
             self.update_json_txt()
         self.showing_type = "json"
@@ -356,7 +359,7 @@ class RPY_File:
         text_control.value = self.json_info_value
         text_control.update()
 
-    def switch_to_rpy_info(self, e):
+    def switch_to_rpy_info(self, _):
         if self.rpy_info_value == "":
             self.update_rpy_txt()
         self.showing_type = "rpy"
@@ -381,7 +384,7 @@ class RPY_File:
         line_textfield.value = str(int(e.pixels / line_height))
         line_textfield.update()
 
-    def text_search(self, e):
+    def text_search(self, _):
         search_textfield = self.Rm.main_page.controls[3].content.controls[0].controls[1]
         search_text = search_textfield.value
         if search_text == "" or search_text is None:
@@ -400,12 +403,3 @@ class RPY_File:
             line_textfield = self.Rm.main_page.controls[3].content.controls[0].controls[0]
             line_textfield.value = str(search_line)
             line_textfield.update()
-
-
-if __name__ == '__main__':
-    RPY_File('./test_json/AmiEvents.json').write_rpy('./out_rpy/')
-    file_list = os.listdir('./test_rpy')
-    for file_name in file_list:
-        if file_name == "SaraEvents.rpy":
-            continue
-        RPY_File('./test_rpy/{}'.format(file_name)).write_json('./test_json')

@@ -7,6 +7,8 @@ import json
 import hashlib
 import requests
 
+from running_log import running_log
+
 name_dict = json.load(open("assets/name_color.json", mode="r", encoding="utf-8"))
 
 
@@ -105,9 +107,9 @@ class text_editor:
 
         return control
 
-    def translate_self(self, e):
-
+    def translate_self(self, _):
         query = self.control.content.controls[1].value
+        running_log(f"在线翻译 {query[:20]}", self.Rm)
         target = ""
 
         free_target = self.translate_free(query)
@@ -124,25 +126,26 @@ class text_editor:
         self.control.content.controls[3].controls[0].update()
         self.update_in_memory(None)
 
-    def transfer(self, e):
+    def transfer(self, _):
         if self.hint == "":
             return
         self.control.content.controls[3].controls[0].value = self.hint
         self.control.content.controls[3].controls[0].update()
         self.update_in_memory(None)
 
-    def open_in_script(self, e):
+    def open_in_script(self, _):
         line_cut_index = self.script.rfind(":")
         file_path = os.path.join(self.Rm.app_config["game_path"], self.script[:line_cut_index])
         line_num = self.script[line_cut_index + 1:]
         cmd = f"notepad.exe /g {line_num} {file_path}"
         os.system(cmd)
 
-    def update_in_memory(self, e):
+    def update_in_memory(self, _):
         new_translation = self.control.content.controls[3].controls[0].value
         self.task_obj.task_result.update({self.dialogue: [self.file_name, self.event_name, new_translation]})
 
     def translate_cost(self, query):
+        running_log(f"百度翻译 {query[:20]}", self.Rm)
         appid = self.Rm.app_config["appid"]
         appkey = self.Rm.app_config["appkey"]
 
@@ -152,7 +155,7 @@ class text_editor:
         from_lang = 'auto'
         to_lang = 'zh'
 
-        endpoint = 'http://api.fanyi.baidu.com'
+        endpoint = 'https://api.fanyi.baidu.com'
         path = '/api/trans/vip/translate'
         url = endpoint + path
 
@@ -172,7 +175,8 @@ class text_editor:
         return target
 
     def translate_free(self, query):
-        url = "http://api.interpreter.caiyunai.com/v1/translator"
+        running_log(f"彩云翻译 {query[:8]}", self.Rm)
+        url = "https://api.interpreter.caiyunai.com/v1/translator"
 
         token = "3975l6lr5pcbvidl6jl2"
 

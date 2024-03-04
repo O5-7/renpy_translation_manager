@@ -6,7 +6,7 @@ import threading
 import time
 
 import flet as ft
-
+from running_log import running_log
 info = list("word,phonetic,definition,translation,pos,collins,oxford,tag,bnc,frq,exchange,detail,audio".split(","))
 
 
@@ -26,10 +26,11 @@ class En_dict:
         )
         self.control = self.build_control()
 
-    def En_dict(self, e):
+    def En_dict(self, _):
+        En_input = self.control.content.controls[0].value.lower()
+        running_log(f"查询字典 {En_input}", self.Rm)
         en_description = self.control.content.controls[1].controls[2]
         cn_description = self.control.content.controls[1].controls[0]
-        En_input = self.control.content.controls[0].value.lower()
         if En_input not in self.dict_json.keys():
             en_description.value = "查询失败"
             cn_description.value = ""
@@ -101,7 +102,8 @@ class En_dict:
 
         return out_control
 
-    def save_to_file(self, e):
+    def save_to_file(self, _):
+
         if not self.is_auto_save_on:
             self.is_auto_save_on = True
             self.auto_save_th.start()
@@ -116,6 +118,7 @@ class En_dict:
                 c.visible = True
             task_column.update()
 
+        running_log(f"保存任务 {task.description} 到本地", self.Rm)
         task.write()
 
 

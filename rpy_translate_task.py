@@ -4,6 +4,8 @@ import time
 import flet as ft
 import json
 import datetime
+
+from running_log import running_log
 from text_editor import text_editor
 from English_dict import En_dict
 
@@ -70,6 +72,7 @@ class rpy_translation_task:
         return rpy_task_control
 
     def read(self):
+        running_log(f"读取task {self.file_path}", self.Rm)
         with open(self.file_path, mode='r', encoding='utf-8') as F:
             read_json = json.load(F)
             self.host_name = read_json['host_name']
@@ -85,7 +88,7 @@ class rpy_translation_task:
         self.control = self.build_control()
 
     def write(self):
-        # print(f"write {self.description}")
+        running_log(f"写task {self.description} 到 {self.file_path}", self.Rm)
         with open(self.file_path, mode='w', encoding='utf-8') as F:
             task_json = {
                 "host_name": self.host_name,
@@ -100,7 +103,8 @@ class rpy_translation_task:
             }
             F.write(json.dumps(task_json, indent=2, ensure_ascii=False))
 
-    def show_task_editor(self, e):
+    def show_task_editor(self, _):
+        running_log(f"打开task {self.description}", self.Rm)
         self.Rm.selected_task = self.hex
         self.Rm.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.Rm.selected_version} >> {self.description}"
         self.Rm.page.controls[0].controls[1].content.content.update()
@@ -159,7 +163,7 @@ class rpy_translation_task:
 
         text_con.update()
 
-    def enter_task(self, e):
+    def enter_task(self, _):
         task_column = self.Rm.main_page.controls[2].controls[1].content.content.controls[1]
         for task in task_column.controls:
             if len(task.content.content.controls) != 1:
@@ -181,7 +185,7 @@ class rpy_translation_task:
                 task_column.update()
                 return
 
-    def exit_task(self, e):
+    def exit_task(self, _):
         task_column = self.Rm.main_page.controls[2].controls[1].content.content.controls[1]
         for task in task_column.controls:
             if len(task.content.content.controls) != 4:

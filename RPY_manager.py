@@ -762,6 +762,9 @@ class RPY_manager(ft.UserControl):
         event_name = add_modify_task_3_dropdown[2].value
         dialogue_name = add_modify_task_3_dropdown[3].value[:8]
         description = add_modify_task_3_dropdown[4].value
+        if any([i is None for i in [rpy_file_name, event_name, dialogue_name, description]]):
+            return
+
         running_log(f"添加润色任务 {description}", self)
 
         if not all([rpy_file_name, event_name, dialogue_name, description]):

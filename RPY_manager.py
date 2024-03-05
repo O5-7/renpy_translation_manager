@@ -33,30 +33,40 @@ class RPY_manager(ft.UserControl):
             Column_controls[1].value = os.path.split(e.path)[-1]
             Column_controls[1].on_change(Column_controls[1])
             Column_controls[1].update()
+            version_name_path_check(None)
 
         self.file_picker = ft.FilePicker(
             on_result=filepicker_path_to_version_dialog
         )
 
-        def version_name_check(e):
+        def version_name_path_check(_):
             Column_controls = self.version_add_dialog.actions[0].content.controls
-            try:
-                e = e.control
-            except AttributeError:
-                pass
+            folder_path = Column_controls[0].controls[0].value
+            version_name = Column_controls[1].value
 
-            if e.value in self.version_list.keys():
-                e.color = "#ba1a1a"
-                e.border_color = "#ba1a1a"
-                e.error_text = "重复的版本"
+            if folder_path in [ver.folder_path for ver in self.version_list.values()]:
+                Column_controls[0].controls[0].color = "#ba1a1a"
+                Column_controls[0].controls[0].border_color = "#ba1a1a"
+                Column_controls[0].controls[0].error_text = "重复的文件夹"
                 Column_controls[2].controls[0].disabled = True
             else:
-                e.color = "#000000"
-                e.border_color = "#000000"
-                e.error_text = ""
+                Column_controls[0].controls[0].color = "#000000"
+                Column_controls[0].controls[0].border_color = "#000000"
+                Column_controls[0].controls[0].error_text = ""
                 Column_controls[2].controls[0].disabled = False
-            e.update()
-            Column_controls[2].controls[0].update()
+
+            if version_name in self.version_list.keys():
+                Column_controls[1].color = "#ba1a1a"
+                Column_controls[1].border_color = "#ba1a1a"
+                Column_controls[1].error_text = "重复的版本"
+                Column_controls[2].controls[0].disabled = True
+            else:
+                Column_controls[1].color = "#000000"
+                Column_controls[1].border_color = "#000000"
+                Column_controls[1].error_text = ""
+                Column_controls[2].controls[0].disabled = False
+
+            self.version_add_dialog.actions[0].content.update()
 
         def update_version_UI_list(_):
             self.main_page.controls[1].content.controls[1].controls = [version.control for version in self.version_list.values()]
@@ -98,7 +108,8 @@ class RPY_manager(ft.UserControl):
                                 [
                                     ft.TextField(
                                         label="文件夹路径",
-                                        width=450
+                                        width=450,
+                                        on_change=version_name_path_check
                                     ),
                                     ft.FilePicker(),
                                     ft.IconButton(
@@ -110,7 +121,7 @@ class RPY_manager(ft.UserControl):
                             ft.TextField(
                                 label="版本名称",
                                 width=450,
-                                on_change=version_name_check
+                                on_change=version_name_path_check
                             ),
                             ft.Row(
                                 [

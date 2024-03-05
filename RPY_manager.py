@@ -1085,8 +1085,8 @@ class RPY_manager(ft.UserControl):
                             acc += len(rpy_file.file_json["dialogue"][event_name])
                         else:
                             acc += len(dialogues)
-
-            acc = len([tl for _, _, tl in task.task_result.values() if tl != ""]) / acc
+            if acc != 0:
+                acc = len([tl for _, _, tl in task.task_result.values() if tl != ""]) / acc
 
             description: str = task.description
 

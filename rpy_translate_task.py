@@ -51,7 +51,7 @@ class rpy_translation_task:
             content=ft.Container(
                 content=ft.Column(
                     [
-                        ft.Text(f"{self.description}", size=10),
+                        ft.Text(f"{self.description}", size=12),
                     ],
                     spacing=0,
                     alignment=ft.MainAxisAlignment.CENTER,
@@ -194,7 +194,7 @@ class rpy_translation_task:
             if text[5:] == self.description:
                 task.content.content = ft.Column(
                     [
-                        ft.Text(f"{self.description}", size=10),
+                        ft.Text(f"{self.description}", size=12),
                     ],
                     spacing=0,
                     alignment=ft.MainAxisAlignment.CENTER,

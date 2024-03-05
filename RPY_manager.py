@@ -496,11 +496,16 @@ class RPY_manager(ft.UserControl):
                                             ),
                                         ),
                                         ft.PopupMenuItem(
+                                            icon=ft.icons.FOLDER_OPEN,
+                                            on_click=lambda _: os.system(f"explorer {self.version_list[self.selected_version].folder_path if self.selected_version != '' else ''}"),
+                                            text="打开文件夹",
+                                        ),
+                                        ft.PopupMenuItem(),
+                                        ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_FORWARD_IOS_ROUNDED,
                                             text="json到rpy",
                                             on_click=lambda _: self.version_list[self.selected_version].json_2_rpy()
                                         ),
-                                        ft.PopupMenuItem(),
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_BACK_IOS_ROUNDED,
                                             text="rpy到json",
@@ -512,8 +517,8 @@ class RPY_manager(ft.UserControl):
                                         name=ft.icons.MENU_ROUNDED,
                                         size=30,
                                         color="#409bdc",
+                                        tooltip="文件管理"
                                     ),
-
                                 )
                             ],
                             width=200,
@@ -546,41 +551,46 @@ class RPY_manager(ft.UserControl):
                             controls=[
                                 ft.TextField(
                                     height=50,
-                                    width=120,
+                                    width=150,
                                     color="white",
                                     on_change=self.task_filter,
                                     hint_text="检索",
                                     hint_style=ft.TextStyle(color="#409BDC")
                                 ),
-                                ft.IconButton(
-                                    icon=ft.icons.CABLE,
-                                    icon_size=22,
-                                    icon_color="#409bdc",
-                                    style=ft.ButtonStyle(
-                                        shape={
-                                            ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0),
-                                        }
+                                ft.PopupMenuButton(
+                                    items=[
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.REFRESH_ROUNDED,
+                                            on_click=self.refresh_tasks,
+                                            text="刷新任务",
+                                        ),
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.FOLDER_OPEN,
+                                            on_click=lambda _: os.system(f"explorer {os.path.join(self.version_list[self.selected_version].folder_path, 'tasks') if self.selected_version != '' else ''}"),
+                                            text="打开任务文件夹",
+                                        ),
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.CABLE,
+                                            on_click=self.open_t2j_transfer_dialog,
+                                            text="提交任务",
+                                        ),
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.ADD_ROUNDED,
+                                            on_click=self.open_add_task,
+                                            text="添加任务"
+                                        ),
+                                    ],
+                                    content=ft.Icon(
+                                        name=ft.icons.MENU_ROUNDED,
+                                        size=30,
+                                        color="#409bdc",
+                                        tooltip="任务管理"
                                     ),
-                                    on_click=self.open_t2j_transfer_dialog,
-                                    tooltip="提交任务"
-                                ),
-                                ft.IconButton(
-                                    icon=ft.icons.ADD_ROUNDED,
-                                    icon_size=22,
-                                    icon_color="#409bdc",
-                                    style=ft.ButtonStyle(
-                                        shape={
-                                            ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0),
-                                        }
-                                    ),
-                                    on_click=self.open_add_task,
-                                    tooltip="添加任务"
                                 )
                             ],
                             width=200,
                             height=50,
-                            spacing=0,
-                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                            spacing=7
                         ),
                         border=ft.border.all(3, "#409bdc"),
                         border_radius=3,
@@ -663,6 +673,7 @@ class RPY_manager(ft.UserControl):
 
     def open_delete_version_dialog(self, _):
         checkbox_Column = self.version_delete_dialog.actions[0].controls[0]
+        checkbox_Column.controls = []
         for version_name, version_obj in self.version_list.items():
             checkbox_Column.controls.append(
                 ft.Row(
@@ -681,6 +692,7 @@ class RPY_manager(ft.UserControl):
         self.page.update()
 
     def delete_version_dialog(self, _):
+        running_log(f"尝试删除version", self)
         checkbox_Column = self.version_delete_dialog.actions[0].controls[0]
         for Row in checkbox_Column.controls:
             checkbox, version_name_text, _, _ = Row.controls
@@ -757,6 +769,7 @@ class RPY_manager(ft.UserControl):
         task_description_textfield.update()
 
     def add_modify_task(self, _):
+        running_log(f"尝试添加润色任务", self)
         add_modify_task_3_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls
         rpy_file_name = add_modify_task_3_dropdown[1].value
         event_name = add_modify_task_3_dropdown[2].value
@@ -816,7 +829,7 @@ class RPY_manager(ft.UserControl):
         self.add_task_dialog.update()
 
     def add_update_task(self, _):
-        running_log("添加更新任务", self)
+        running_log("尝试添加更新任务", self)
         tasks_dick = self.version_list[self.selected_version].tasks_dict
 
         task_info = self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[4].value
@@ -1192,6 +1205,34 @@ class RPY_manager(ft.UserControl):
 
         self.v2v_transfer_dialog.open = False
         self.page.update()
+
+    def refresh_tasks(self, _):
+        if self.selected_version == "":
+            return
+        running_log(f"刷新任务")
+        self.selected_task = ""
+        self.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.selected_version}"
+        self.page.controls[0].controls[1].content.content.update()
+
+        self.version_list[self.selected_version].scan_tasks()
+        tasks_dict = self.version_list[self.selected_version].tasks_dict
+        tasks_dict = {k: tasks_dict[k] for k in sorted(tasks_dict, reverse=True, key=lambda t: datetime.datetime.strptime(tasks_dict[t].host_date, date_format).timestamp())}
+        task_column = self.main_page.controls[2].controls[1].content.content.controls[1]
+        task_column.controls = [task_obj.control for task_obj in tasks_dict.values()]
+        for c in task_column.controls:
+            c.visible = True
+        task_column.update()
+
+        self.main_page.controls[3] = ft.Container(
+            ft.Container(width=1060, height=890, bgcolor="#eeeeee"),
+            border_radius=5,
+            border=ft.border.all(5, "#ff7f00")
+        )
+
+        for version_obj in self.version_list.values():
+            version_obj.update_control()
+        self.update_version_UI_list(None)
+        self.main_page.update()
 
     def save_setting_config(self, _):
         running_log("保存设置", self)

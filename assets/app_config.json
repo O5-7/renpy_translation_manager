@@ -4,5 +4,8 @@
   "user_name": "",
   "task_auto_save": 20,
   "game_path": "",
-  "default_versions": {}
+  "default_versions": {
+    "0.33": "E:\\恋爱课程LessonsInLove0.29\\0.33",
+    "0.32": "E:\\恋爱课程LessonsInLove0.29\\0.32"
+  }
 }

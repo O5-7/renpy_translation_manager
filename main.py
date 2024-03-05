@@ -78,5 +78,6 @@ def main(page: ft.Page):
     running_log("启动成功")
 
 
+print("")
 running_log("程序入口")
 ft.app(target=main)

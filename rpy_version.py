@@ -157,11 +157,14 @@ class rpy_version:
             rpy_obj.write_rpy(self.folder_path)
 
     def scan_tasks(self) -> str:
-        running_log(f"扫描tasks {self.version}", self.Rm)
+        running_log("尝试扫描tasks", self.Rm)
+        self.tasks_dict = {}
+
         tasks_folder_path = os.path.join(self.folder_path, 'tasks')
         if not os.path.isdir(tasks_folder_path):
             return 'no_such_tasks'
         task_file_names = os.listdir(tasks_folder_path)
+        running_log(f"扫描tasks {task_file_names}", self.Rm)
         for task_file_name in task_file_names:
             task_name, task_hex = task_file_name[:-5].split('@')
             task_obj = rpy_translation_task(os.path.join(tasks_folder_path, task_file_name), self.Rm)

@@ -14,7 +14,7 @@ class En_dict:
     def __init__(self, rm):
         super().__init__()
         self.Rm = rm
-        if os.path.isfile("assets/ecdict_.csv") and os.path.isfile("assets/dict_line.json"):
+        if os.path.isfile("assets/ecdict.csv") and os.path.isfile("assets/dict_line.json"):
             self.dict_json = json.load(open("assets/dict_line.json", encoding="utf-8"))
 
         self.is_auto_save_on = False
@@ -36,9 +36,10 @@ class En_dict:
             cn_description.value = ""
             en_description.update()
             cn_description.update()
+            running_log(f"查询失败", self.Rm)
             return
         line_num = self.dict_json[En_input] + 1
-        with open("assets/ecdict_.csv", mode="r", encoding="utf-8") as F:
+        with open("assets/ecdict.csv", mode="r", encoding="utf-8") as F:
             for _ in range(line_num):
                 F.readline()
             word_line = csv.reader(F, delimiter=',').__next__()
@@ -46,6 +47,7 @@ class En_dict:
             cn_description.value = word_line[3].replace("\\n", "\n\n")
             en_description.update()
             cn_description.update()
+            running_log(f"查询成功", self.Rm)
 
     def build_control(self):
         out_control = ft.Container(
@@ -60,7 +62,7 @@ class En_dict:
                         text_size=17,
                         on_submit=self.En_dict,
                         hint_text="字典",
-                        disabled=not (os.path.isfile("assets/ecdict_.csv") and os.path.isfile("assets/dict_line.json"))
+                        disabled=not (os.path.isfile("assets/ecdict.csv") and os.path.isfile("assets/dict_line.json"))
                     ),
                     ft.Column(
                         [
@@ -103,7 +105,7 @@ class En_dict:
         return out_control
 
     def save_to_file(self, _):
-
+        running_log(f"尝试保存任务", self.Rm)
         if not self.is_auto_save_on:
             self.is_auto_save_on = True
             self.auto_save_th.start()

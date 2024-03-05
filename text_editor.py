@@ -120,7 +120,7 @@ class text_editor:
             if "trans_result" in cost_target.keys():
                 target = cost_target["trans_result"][0]["dst"]
             else:
-                target = "错误"
+                target = "错误 请检查appid和appkey"
 
         self.control.content.controls[3].controls[0].value = target
         self.control.content.controls[3].controls[0].update()
@@ -134,6 +134,8 @@ class text_editor:
         self.update_in_memory(None)
 
     def open_in_script(self, _):
+        if self.Rm.app_config["game_path"] == "":
+            return
         line_cut_index = self.script.rfind(":")
         file_path = os.path.join(self.Rm.app_config["game_path"], self.script[:line_cut_index])
         line_num = self.script[line_cut_index + 1:]
@@ -145,7 +147,7 @@ class text_editor:
         self.task_obj.task_result.update({self.dialogue: [self.file_name, self.event_name, new_translation]})
 
     def translate_cost(self, query):
-        running_log(f"百度翻译 {query[:20]}", self.Rm)
+        running_log(f"百度翻译", self.Rm)
         appid = self.Rm.app_config["appid"]
         appkey = self.Rm.app_config["appkey"]
 
@@ -175,7 +177,7 @@ class text_editor:
         return target
 
     def translate_free(self, query):
-        running_log(f"彩云翻译 {query[:8]}", self.Rm)
+        running_log(f"彩云翻译", self.Rm)
         url = "https://api.interpreter.caiyunai.com/v1/translator"
 
         token = "3975l6lr5pcbvidl6jl2"

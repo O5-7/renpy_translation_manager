@@ -22,6 +22,8 @@ class RPY_manager(ft.UserControl):
         self.selected_task = ''
         self.user_name = ''
 
+        self.temp_path = os.getcwd()
+
         def filepicker_path_to_version_dialog(e: ft.FilePickerResultEvent):
             if e.path is None:
                 return
@@ -372,6 +374,17 @@ class RPY_manager(ft.UserControl):
                             ),
                             on_click=self.open_setting_config,
                             tooltip="设置"
+                        ),
+                        ft.IconButton(
+                            icon=ft.icons.FOLDER_SPECIAL,
+                            icon_color="#eb9da5",
+                            icon_size=34,
+                            style=ft.ButtonStyle(
+                                shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=5)},
+                                bgcolor={ft.MaterialState.DEFAULT: "#71363c"},
+                            ),
+                            on_click=lambda _: os.system(f"explorer {self.temp_path}"),
+                            tooltip="打开缓存文件夹"
                         ),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER

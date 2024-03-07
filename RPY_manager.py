@@ -323,7 +323,7 @@ class RPY_manager(ft.UserControl):
                         ft.TextButton(
                             icon=ft.icons.CHECK_ROUNDED,
                             text="转移翻译到json",
-                            on_click=self.move_task_result_to_json_file
+                            on_click=self.transfer_task_result_to_json_file
                         )
                     ],
                     height=500,
@@ -363,6 +363,28 @@ class RPY_manager(ft.UserControl):
                     width=500
                 ),
             ],
+        )
+
+        self.merge_tasks_dialog = ft.AlertDialog(
+            title=ft.Text("选择要合并的任务", size=20),
+            actions=[
+                ft.Column(
+                    [
+                        ft.Column(
+                            height=400,
+                            scroll=ft.ScrollMode.ALWAYS
+                        ),
+                        ft.TextField(label="新描述"),
+                        ft.TextButton(
+                            icon=ft.icons.CALL_MERGE_SHARP,
+                            text="合并任务",
+                            on_click=self.merge_tasks
+                        )
+                    ],
+                    height=500,
+                    width=600,
+                ),
+            ]
         )
 
     def close_app(self, _):
@@ -603,6 +625,11 @@ class RPY_manager(ft.UserControl):
                                             on_click=self.open_add_task,
                                             text="添加任务"
                                         ),
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.CALL_MERGE_SHARP,
+                                            on_click=self.open_merge_task,
+                                            text="合并任务"
+                                        ),
                                     ],
                                     content=ft.Icon(
                                         name=ft.icons.MENU_ROUNDED,
@@ -841,8 +868,7 @@ class RPY_manager(ft.UserControl):
         )
 
         tasks_dick = {k: tasks_dick[k] for k in sorted(tasks_dick, reverse=True, key=lambda t: datetime.datetime.strptime(tasks_dick[t].host_date, date_format).timestamp())}
-        for version_obj in self.version_list.values():
-            version_obj.update_control()
+        self.version_list[self.selected_version].update_control()
         self.update_version_UI_list(None)
 
         task_column = self.main_page.controls[2].controls[1].content.content.controls[1]
@@ -850,7 +876,7 @@ class RPY_manager(ft.UserControl):
         task_column.update()
 
         self.add_task_dialog.open = False
-        self.add_task_dialog.update()
+        self.page.update()
 
     def add_update_task(self, _):
         running_log("尝试添加更新任务", self)
@@ -1097,7 +1123,7 @@ class RPY_manager(ft.UserControl):
                         else:
                             acc += len(dialogues)
             if acc != 0:
-                acc = len([tl for _, _, tl in task.task_result.values() if tl != ""]) / acc
+                acc = sum([sum([len(e) for e in f.values()]) for f in task.task_result.values()]) / acc
 
             description: str = task.description
 
@@ -1123,14 +1149,117 @@ class RPY_manager(ft.UserControl):
                         ),
                     ]
                 )
-
             )
 
         self.page.dialog = self.t2j_transfer_dialog
         self.t2j_transfer_dialog.open = True
         self.page.update()
 
-    def move_task_result_to_json_file(self, _):
+    def open_merge_task(self, _):
+        merge_Column = self.merge_tasks_dialog.actions[0].controls[0]
+        merge_Column.controls = []
+
+        for task_hex, task in self.version_list[self.selected_version].tasks_dict.items():
+            description: str = task.description
+            merge_Column.controls.append(
+                ft.Row(
+                    [
+                        ft.Checkbox(),
+                        ft.Text(task_hex, visible=False),
+                        ft.Text(
+                            value=description,
+                            font_family="Consolas",
+                            size=15,
+                            width=400,
+                        ),
+                    ]
+                )
+            )
+
+        self.page.dialog = self.merge_tasks_dialog
+        self.merge_tasks_dialog.open = True
+        self.page.update()
+
+    def merge_tasks(self, _):
+        running_log("尝试合并任务")
+        need_merge_list = []
+
+        check_boxes_column = self.merge_tasks_dialog.actions[0].controls[0]
+        for row in check_boxes_column.controls:
+            checkbox, task_hex, _ = row.controls
+            if checkbox.value:
+                need_merge_list.append(task_hex.value)
+        if len(need_merge_list) <= 1:
+            return
+
+        host_date = datetime.datetime.fromtimestamp(time.time()).strftime(date_format)
+        description = self.merge_tasks_dialog.actions[0].controls[1].value
+        task_name = "_".join(need_merge_list)
+
+        if description == "":
+            return
+        new_task_hex = hashlib.md5(f"{task_name}{description}{host_date}".encode(encoding='UTF-8')).hexdigest()
+        new_task_hex = new_task_hex[:8]
+        task_file_name = f"{description}@{new_task_hex}.json"
+        file_path = os.path.join(self.version_list[self.selected_version].folder_path, "tasks", task_file_name)
+
+        new_file_task = {
+            "host_name": self.user_name,
+            "host_date": host_date,
+            "worker_name": "merge_tasks",
+            "last_change_data": "",
+            "hex": new_task_hex,
+            "task_type": "merge",
+            "description": description,
+            "task_content": {},
+            "task_result": {}
+        }
+
+        running_log(f"合并任务{need_merge_list}")
+        for merge_task_hex in need_merge_list:
+            merge_task = self.version_list[self.selected_version].tasks_dict[merge_task_hex]
+
+            # 任务描述合并
+            for file_name, events in merge_task.task_content.items():
+                if file_name not in new_file_task["task_content"].keys():
+                    new_file_task["task_content"].update({file_name: {}})
+                for event_name, dialogs in events.items():
+                    if event_name not in new_file_task["task_content"][file_name].keys():
+                        new_file_task["task_content"][file_name].update({event_name: []})
+                    if dialogs[0] == "ALL":
+                        new_file_task["task_content"][file_name][event_name] = ["ALL"]
+                    elif new_file_task["task_content"][file_name][event_name][0] != "ALL":
+                        exist_dialog = new_file_task["task_content"][file_name][event_name]
+                        new_file_task["task_content"][file_name][event_name] = list(set(exist_dialog) | set(dialogs))
+
+            for file_name, events in merge_task.task_result.items():
+                if file_name not in new_file_task["task_result"].keys():
+                    new_file_task["task_result"].update({file_name: {}})
+                for event_name, dialogs in events.items():
+                    if event_name not in new_file_task["task_result"][file_name].keys():
+                        new_file_task["task_result"][file_name].update({event_name: {}})
+                    new_file_task["task_result"][file_name][event_name].update(dialogs)
+
+        with open(file_path, mode='w', encoding='utf-8') as F:
+            F.write(json.dumps(new_file_task, indent=2, ensure_ascii=False))
+
+        tasks_dick = self.version_list[self.selected_version].tasks_dict
+        tasks_dick.update(
+            {new_task_hex: rpy_translation_task(file_path, self)}
+        )
+
+        tasks_dick = {k: tasks_dick[k] for k in sorted(tasks_dick, reverse=True, key=lambda t: datetime.datetime.strptime(tasks_dick[t].host_date, date_format).timestamp())}
+        self.version_list[self.selected_version].update_control()
+        self.update_version_UI_list(None)
+
+        task_column = self.main_page.controls[2].controls[1].content.content.controls[1]
+        task_column.controls = [task_obj.control for task_obj in tasks_dick.values()]
+        task_column.update()
+
+        self.merge_tasks_dialog.open = False
+        self.page.update()
+
+    def transfer_task_result_to_json_file(self, _):
         running_log("转移任务翻译到json", self)
         check_boxes_column = self.t2j_transfer_dialog.actions[0].controls[0]
         ver_obj = self.version_list[self.selected_version]
@@ -1139,15 +1268,19 @@ class RPY_manager(ft.UserControl):
             checkbox, task_hex, _, _ = row.controls
             if checkbox.value:
                 task_obj = self.version_list[self.selected_version].tasks_dict[task_hex.value]
-                for dialogue, (file_name, event_name, translation) in task_obj.task_result.items():
+                for file_name, event_dict in task_obj.task_result.items():
                     update_rpy_set.add(file_name)
-                    if event_name == "strings":
-                        for strings_list in ver_obj.rpy_dict[file_name].file_json["strings"]:
-                            for strings in strings_list:
-                                if hashlib.md5(strings["old"].encode("utf-8")).hexdigest()[:8] == dialogue:
-                                    strings["new"] = translation
-                    else:
-                        ver_obj.rpy_dict[file_name].file_json["dialogue"][event_name][dialogue]["translation"] = translation
+                    for event_name, dialogue_dict in event_dict.items():
+                        if event_name == "strings":
+                            for dialogue, translation in dialogue_dict.items():
+
+                                for strings_list in ver_obj.rpy_dict[file_name].file_json["strings"]:
+                                    for strings in strings_list:
+                                        if hashlib.md5(strings["old"].encode("utf-8")).hexdigest()[:8] == dialogue:
+                                            strings["new"] = translation
+                        else:
+                            for dialogue, translation in dialogue_dict.items():
+                                ver_obj.rpy_dict[file_name].file_json["dialogue"][event_name][dialogue]["translation"] = translation
 
         for file_name in update_rpy_set:
             rpy_obj = ver_obj.rpy_dict[file_name]

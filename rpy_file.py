@@ -315,7 +315,10 @@ class RPY_File:
             if pb is not None:
                 progress_new += 1
                 pb.value = progress_new / progress_len
-                pb.update()
+                try:
+                    pb.update()
+                except AssertionError:
+                    return
             for dialogue_hex, line in lines.items():
                 line = """# {script}\ntranslate {language} {event}_{dialogue_hex}:\n\n    # {speaker}"{origin}"\n    {speaker}"{translation}"\n\n""".format(
                     script=line['script'],

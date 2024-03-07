@@ -145,16 +145,67 @@ class rpy_version:
 
     def rpy_2_json(self):
         running_log(f"rpy转移到json {self.version}", self.Rm)
+
+        r2j_dialog = ft.AlertDialog(
+            title=ft.Text("rpy转移到json 请勿关闭软件!", size=20, color="#FF0000", font_family="Consolas"),
+            actions=[
+                ft.Column(
+                    [
+                        ft.Text("准备中", size=20),
+                        ft.ProgressBar(width=380)
+                    ],
+                    width=400
+                )
+            ]
+        )
+
+        self.Rm.page.dialog = r2j_dialog
+        r2j_dialog.open = True
+        self.Rm.page.update()
+
         self.read_rpy_by_rpy()
-        for rpy_obj in self.rpy_dict.values():
+        for rpy_num, rpy_obj in enumerate(self.rpy_dict.values()):
+            r2j_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
+            r2j_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)
+            r2j_dialog.update()
             rpy_obj.write_json(self.folder_path)
+
         self.switch_files_and_tasks_column(None)
+
+        r2j_dialog.open = False
+        self.Rm.page.update()
+
+        running_log(f"转移成功 {self.version}", self.Rm)
 
     def json_2_rpy(self):
         running_log(f"json转移到rpy {self.version}", self.Rm)
+        j2r_dialog = ft.AlertDialog(
+            title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000", font_family="Consolas"),
+            actions=[
+                ft.Column(
+                    [
+                        ft.Text("准备中...", size=20),
+                        ft.ProgressBar(width=380)
+                    ],
+                    width=400
+                )
+            ]
+        )
+        self.Rm.page.dialog = j2r_dialog
+        j2r_dialog.open = True
+        self.Rm.page.update()
+
         self.read_rpy_by_json()
-        for rpy_obj in self.rpy_dict.values():
+        for rpy_num, rpy_obj in enumerate(self.rpy_dict.values()):
+            j2r_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
+            j2r_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)
+            j2r_dialog.update()
             rpy_obj.write_rpy(self.folder_path)
+
+        j2r_dialog.open = False
+        self.Rm.page.update()
+
+        running_log(f"转移成功 {self.version}", self.Rm)
 
     def scan_tasks(self) -> str:
         running_log("尝试扫描tasks", self.Rm)

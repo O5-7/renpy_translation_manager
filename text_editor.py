@@ -26,8 +26,12 @@ class text_editor:
         self.task_obj = task_obj
         self.Rm = rm
         self.control = self.build_control()
-        if dialogue in task_obj.task_result.keys():
-            self.control.content.controls[3].controls[0].value = task_obj.task_result[dialogue][2]
+
+        try:
+            self.control.content.controls[3].controls[0].value = task_obj.task_result[self.file_name][self.event_name][self.dialogue]
+            self.control.content.controls[3].controls[0].bgcolor = "#dfe2eb"
+        except KeyError:
+            pass
 
     def build_control(self):
         rpy_dict = self.Rm.version_list[self.Rm.selected_version].rpy_dict
@@ -63,6 +67,7 @@ class text_editor:
                                 filled=True,
                                 multiline=True,
                                 border_radius=0,
+                                bgcolor="#eb969f"
                             ),
                             ft.IconButton(
                                 icon=ft.icons.RAW_ON_ROUNDED,
@@ -144,7 +149,20 @@ class text_editor:
 
     def update_in_memory(self, _):
         new_translation = self.control.content.controls[3].controls[0].value
-        self.task_obj.task_result.update({self.dialogue: [self.file_name, self.event_name, new_translation]})
+
+        text_field = self.control.content.controls[3].controls[0]
+        text_field.bgcolor = "#eb969f" if new_translation == "" else "#dfe2eb"
+        text_field.update()
+
+        # self.task_obj.task_result.update({self.dialogue: [self.file_name, self.event_name, new_translation]}) # 可能会有歧义冲突
+        if self.file_name not in self.task_obj.task_result.keys():
+            self.task_obj.task_result.update({self.file_name: {}})
+        if self.event_name not in self.task_obj.task_result[self.file_name].keys():
+            self.task_obj.task_result[self.file_name].update({self.event_name: {}})
+        if self.dialogue not in self.task_obj.task_result[self.file_name][self.event_name].keys():
+            self.task_obj.task_result[self.file_name][self.event_name].update({self.dialogue: ""})
+
+        self.task_obj.task_result[self.file_name][self.event_name].update({self.dialogue: new_translation})
 
     def translate_cost(self, query):
         running_log(f"百度翻译", self.Rm)

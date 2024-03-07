@@ -11,6 +11,12 @@ from English_dict import En_dict
 
 date_format = '%Y-%m-%d %H:%M:%S'
 
+task_color = {
+    "modify": ["#618aeb", "#8ab6de"],
+    "update": ["#656feb", "#90aade"],
+    "merge": ["#8166eb", "#949cde"],
+}
+
 
 class rpy_translation_task:
     def __init__(self, file_path: str, rm):
@@ -59,9 +65,9 @@ class rpy_translation_task:
                     height=30,
                 ),
                 width=200,
-                border=ft.border.all(5, color="#618aeb" if self.task_type == "modify" else "#656feb"),
+                border=ft.border.all(5, color=task_color[self.task_type][0]),
                 border_radius=5,
-                bgcolor="#8ab6de" if self.task_type == "modify" else "#90aade",
+                bgcolor=task_color[self.task_type][1],
             ),
             on_double_tap=self.show_task_editor,
             on_enter=self.enter_task,
@@ -88,7 +94,7 @@ class rpy_translation_task:
         self.control = self.build_control()
 
     def write(self):
-        running_log(f"写task {self.description} 到 {self.file_path}", self.Rm)
+        running_log(f"写任务 {self.description} 到 {self.file_path}", self.Rm)
         with open(self.file_path, mode='w', encoding='utf-8') as F:
             task_json = {
                 "host_name": self.host_name,
@@ -136,6 +142,9 @@ class rpy_translation_task:
         for file_name, event_dict in self.task_content.items():
             rpy_file = rpy_dict[file_name]
             for event_name, dialogues in event_dict.items():
+                text_con.content.controls[1].controls.append(
+                    ft.Text(f"{file_name}:  {event_name}:", height=50, color="#FFFFFF", bgcolor="#000000", width=1050, size=35)
+                )
                 if event_name == "strings":
                     if dialogues[0] == "ALL":
                         for strings in rpy_file.file_json["strings"]:

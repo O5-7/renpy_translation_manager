@@ -121,9 +121,8 @@ class rpy_translation_task:
         text_con.content = ft.Row(
             [
                 ft.Container(),
-                ft.Column(
+                ft.ListView(
                     spacing=0,
-                    scroll=ft.ScrollMode.ALWAYS,
                     height=890,
                     width=900,
                 ),
@@ -138,12 +137,13 @@ class rpy_translation_task:
             height=890,
             spacing=0
         )
+        text_con.update()
 
         for file_name, event_dict in self.task_content.items():
             rpy_file = rpy_dict[file_name]
             for event_name, dialogues in event_dict.items():
                 text_con.content.controls[1].controls.append(
-                    ft.Text(f"{file_name}:  {event_name}:", height=50, color="#FFFFFF", bgcolor="#000000", width=1050, size=35)
+                    ft.Text(f"{file_name}:  {event_name}:", height=50, color="#FFFFFF", bgcolor="#2b2b2b", width=1050, size=35)
                 )
                 if event_name == "strings":
                     if dialogues[0] == "ALL":

@@ -1226,10 +1226,10 @@ class RPY_manager(ft.UserControl):
                 for event_name, dialogs in events.items():
                     if event_name not in new_file_task["task_content"][file_name].keys():
                         new_file_task["task_content"][file_name].update({event_name: []})
+                    exist_dialog = new_file_task["task_content"][file_name][event_name]
                     if dialogs[0] == "ALL":
                         new_file_task["task_content"][file_name][event_name] = ["ALL"]
-                    elif new_file_task["task_content"][file_name][event_name][0] != "ALL":
-                        exist_dialog = new_file_task["task_content"][file_name][event_name]
+                    elif len(exist_dialog) == 0 or exist_dialog[0] != "ALL":
                         new_file_task["task_content"][file_name][event_name] = list(set(exist_dialog) | set(dialogs))
 
             for file_name, events in merge_task.task_result.items():

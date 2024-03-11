@@ -66,6 +66,18 @@ class RPY_manager(ft.UserControl):
                 Column_controls[1].error_text = ""
                 Column_controls[2].controls[0].disabled = False
 
+            if folder_path == "":
+                Column_controls[0].controls[0].color = "#ba1a1a"
+                Column_controls[0].controls[0].border_color = "#ba1a1a"
+                Column_controls[0].controls[0].error_text = "不能为空"
+                Column_controls[2].controls[0].disabled = True
+
+            if version_name == "":
+                Column_controls[1].color = "#ba1a1a"
+                Column_controls[1].border_color = "#ba1a1a"
+                Column_controls[1].error_text = "不能为空"
+                Column_controls[2].controls[0].disabled = True
+
             self.version_add_dialog.actions[0].content.update()
 
         def update_version_UI_list(_):

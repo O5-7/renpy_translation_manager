@@ -26,7 +26,7 @@ def main(page: ft.Page):
                     content=ft.Image(
                         src='assets/icon.png'
                     ),
-                    on_hover=lambda _: print()
+                    on_hover=lambda _: None
                 ),
                 ft.WindowDragArea(
                     ft.Container(

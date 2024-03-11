@@ -21,6 +21,8 @@ class RPY_manager(ft.UserControl):
         self.selected_version = ''
         self.selected_task = ''
         self.user_name = ''
+        self.name_dict = {}
+        self.get_name_dict()
 
         self.temp_path = os.getcwd()
 
@@ -728,6 +730,37 @@ class RPY_manager(ft.UserControl):
         )
 
         return self.main_page
+
+    def get_name_dict(self):
+        running_log("尝试读取人名对照表")
+        if self.app_config["game_path"] == "":
+            running_log("失败 请设置游戏根目录")
+            return
+        def_file_path = os.path.join(self.app_config["game_path"], "game/definitions.rpy")
+        if not os.path.isfile(def_file_path):
+            running_log("失败 definitions.rpy不存在")
+            return
+        with open(def_file_path, mode="r", encoding='utf-8') as F:
+            def absolute(_):
+                pass
+
+            class Character:
+                def __init__(self, name, color="", who_outlines=None, who_font=None, ):
+                    self.name = name
+                    self.color = color
+
+                def get_name_color(self):
+                    return [self.name, self.color]
+
+            for line in F.readlines():
+                line: str
+                if line.find("Character(") != -1:
+                    line = line[11:-1]
+                    ed_index = line.find("=")
+                    key = line[:ed_index - 1]
+                    char_obj_str = line[ed_index + 2:]
+                    char_obj = eval(char_obj_str)
+                    self.name_dict.update({key: char_obj.get_name_color()})
 
     def open_version_folder_pick(self, _):
         self.page.dialog = self.version_add_dialog

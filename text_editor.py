@@ -9,8 +9,6 @@ import requests
 
 from running_log import running_log
 
-name_dict = json.load(open("assets/name_color.json", mode="r", encoding="utf-8"))
-
 
 class text_editor:
     def __init__(self, file_name: str, event_name: str, dialogue: str, task_obj, rm):
@@ -45,8 +43,12 @@ class text_editor:
                         self.script = strings["script"]
         else:
             tr_dict = rpy_obj.file_json["dialogue"][self.event_name][self.dialogue]
-            self.speaker = "" if tr_dict["speaker"] == "<>" else name_dict[tr_dict["speaker"]][0]
-            self.speaker_color = "" if tr_dict["speaker"] == "<>" else name_dict[tr_dict["speaker"]][1]
+
+            self.speaker = self.Rm.name_dict[tr_dict["speaker"]][0] if tr_dict["speaker"] in self.Rm.name_dict.keys() else "<未知的角色 请检查设置中的游戏根目录以及版本>"
+            self.speaker_color = self.Rm.name_dict[tr_dict["speaker"]][1] if tr_dict["speaker"] in self.Rm.name_dict.keys() else ""
+            if tr_dict["speaker"] == "<>":
+                self.speaker = ""
+
             self.origin = tr_dict["origin"]
             self.hint = tr_dict["translation"]
             self.script = tr_dict["script"]

@@ -3,8 +3,6 @@
   "appkey": "",
   "user_name": "",
   "task_auto_save": 20,
-  "game_path": "E:\\恋爱课程LessonsInLove0.29\\LessonsInLove0.37.0-0.37.0-pc",
-  "default_versions": {
-    "0.38": "E:\\恋爱课程LessonsInLove0.29\\0.38"
-  }
+  "game_path": "",
+  "default_versions": {}
 }

@@ -25,7 +25,7 @@ class rpy_version:
         event_list: 事件列表
         """
         if self.is_init_file():
-            self.config = json.load(open(os.path.join(self.folder_path, 'config.json')))
+            self.config = json.load(open(os.path.join(self.folder_path, 'config.json'), mode="r", encoding='utf-8'))
             self.read_rpy_by_json()
         else:
             self.init_running_file()

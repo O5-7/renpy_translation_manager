@@ -1131,6 +1131,10 @@ class RPY_manager(ft.UserControl):
     def load_config(self):
         self.user_name = self.app_config['user_name']
         for name, path in self.app_config['default_versions'].items():
+            if not os.path.isdir(path):
+                running_log(f"{path} 不存在")
+                del self.app_config['default_versions'][name]
+                continue
             self.version_list.update({name: rpy_version(path, name, self)})
             self.update_version_UI_list(None)
 

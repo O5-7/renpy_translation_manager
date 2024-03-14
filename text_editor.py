@@ -56,8 +56,8 @@ class text_editor:
         control = ft.Container(
             ft.Column(
                 [
-                    ft.Text(self.speaker, color=self.speaker_color, font_family="Consolas", size=20, ),
-                    ft.Text(self.origin, font_family="Consolas", size=20, selectable=True),
+                    ft.Text(self.speaker, color=self.speaker_color, font_family="黑体", size=20, ),
+                    ft.Text(self.origin, font_family="黑体", size=20, selectable=True),
                     ft.Text(self.hint, font_family="黑体", size=17, selectable=True, color="#878787"),
                     ft.Row(
                         [

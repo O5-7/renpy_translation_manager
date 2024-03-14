@@ -26,7 +26,7 @@ class rpy_translation_task:
         self.host_name: str = ''
         self.host_date: str = ''
         self.worker_name: str = ''
-        self.last_change_data: str = ''
+        self.last_change_date: str = ''
         self.hex: str = ''
         self.description: str = ''
         self.task_type: str = ''  # ["update, ""modify"]
@@ -40,7 +40,17 @@ class rpy_translation_task:
             self.host_name = read_json['host_name']
             self.host_date = read_json['host_date']
             self.worker_name = read_json['worker_name']
-            self.last_change_data = read_json['last_change_data']
+
+            try:
+                self.last_change_date = read_json['last_change_data']
+            except KeyError:
+                pass
+
+            try:
+                self.last_change_date = read_json['last_change_date']
+            except KeyError:
+                pass
+
             self.hex = read_json['hex']
             self.description = read_json['description']
             self.task_type = read_json['task_type']
@@ -62,7 +72,7 @@ class rpy_translation_task:
                     spacing=0,
                     alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.START,
-                    height=30,
+                    height=40,
                 ),
                 width=200,
                 border=ft.border.all(5, color=task_color[self.task_type][0]),
@@ -84,7 +94,16 @@ class rpy_translation_task:
             self.host_name = read_json['host_name']
             self.host_date = read_json['host_date']
             self.worker_name = read_json['worker_name']
-            self.last_change_data = read_json['last_change_data']
+            try:
+                self.last_change_date = read_json['last_change_data']
+            except KeyError:
+                pass
+
+            try:
+                self.last_change_date = read_json['last_change_date']
+            except KeyError:
+                pass
+
             self.hex = read_json['hex']
             self.description = read_json['description']
             self.task_type = read_json['task_type']
@@ -100,7 +119,7 @@ class rpy_translation_task:
                 "host_name": self.host_name,
                 "host_date": self.host_date,
                 "worker_name": self.worker_name,
-                "last_change_data": datetime.datetime.fromtimestamp(time.time()).strftime(date_format),
+                "last_change_date": datetime.datetime.fromtimestamp(time.time()).strftime(date_format),
                 "hex": self.hex,
                 "task_type": self.task_type,
                 "description": self.description,
@@ -112,7 +131,7 @@ class rpy_translation_task:
     def show_task_editor(self, _):
         running_log(f"打开task {self.description}", self.Rm)
         self.Rm.selected_task = self.hex
-        self.Rm.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.Rm.selected_version} >> {self.description}"
+        self.Rm.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.Rm.selected_version} >> {self.description}"
         self.Rm.page.controls[0].controls[1].content.content.update()
 
         rpy_dict = self.Rm.version_list[self.Rm.selected_version].rpy_dict
@@ -209,7 +228,7 @@ class rpy_translation_task:
                     alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.START,
                     animate_size=500,
-                    height=30,
+                    height=40,
                 )
                 task_column.update()
                 return

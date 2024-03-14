@@ -157,7 +157,7 @@ class RPY_manager(ft.UserControl):
                     [
                         ft.Column(
                             [],
-                            width=400,
+                            width=500,
                             height=250,
                             scroll=ft.ScrollMode.ALWAYS
                         ),
@@ -797,6 +797,26 @@ class RPY_manager(ft.UserControl):
                 running_log(f"删除version {version_name}", self)
                 del self.version_list[version_name]
 
+                if self.selected_version == version_name:
+                    self.page.controls[0].controls[1].content.content.value = f"RTM"
+                    self.page.controls[0].controls[1].content.content.update()
+
+                    files_column = self.main_page.controls[2].controls[0].content.content.controls[1]
+                    task_column = self.main_page.controls[2].controls[1].content.content.controls[1]
+                    text_con = self.main_page.controls[3]
+
+                    files_column.controls = []
+                    task_column.controls = []
+                    text_con.content = ft.Container(
+                        ft.Container(width=1060, height=890, bgcolor="#eeeeee"),
+                        border_radius=5,
+                        border=ft.border.all(5, "#ff7f00")
+                    )
+
+                    task_column.update()
+                    files_column.update()
+                    text_con.update()
+
         self.version_list = {k: self.version_list[k] for k in sorted(self.version_list, reverse=True)}
         self.update_version_UI_list(None)
 
@@ -887,7 +907,7 @@ class RPY_manager(ft.UserControl):
             "host_name": self.user_name,
             "host_date": host_date,
             "worker_name": "",
-            "last_change_data": "",
+            "last_change_date": "",
             "hex": task_hex,
             "task_type": "modify",
             "description": description,
@@ -953,7 +973,7 @@ class RPY_manager(ft.UserControl):
                     "host_name": self.user_name,
                     "host_date": host_date,
                     "worker_name": "",
-                    "last_change_data": "",
+                    "last_change_date": "",
                     "hex": task_hex,
                     "task_type": "update",
                     "description": description,
@@ -982,7 +1002,7 @@ class RPY_manager(ft.UserControl):
                     "host_name": self.user_name,
                     "host_date": host_date,
                     "worker_name": "",
-                    "last_change_data": "",
+                    "last_change_date": "",
                     "hex": task_hex,
                     "task_type": "update",
                     "description": description,
@@ -1010,7 +1030,7 @@ class RPY_manager(ft.UserControl):
                 "host_name": self.user_name,
                 "host_date": host_date,
                 "worker_name": "",
-                "last_change_data": "",
+                "last_change_date": "",
                 "hex": task_hex,
                 "task_type": "update",
                 "description": description,
@@ -1038,7 +1058,7 @@ class RPY_manager(ft.UserControl):
                 "host_name": self.user_name,
                 "host_date": host_date,
                 "worker_name": "",
-                "last_change_data": "",
+                "last_change_date": "",
                 "hex": task_hex,
                 "task_type": "update",
                 "description": description,
@@ -1118,7 +1138,7 @@ class RPY_manager(ft.UserControl):
         text_filter = e.control.value.lower()
         controls = self.main_page.controls[2].controls[0].content.content.controls[1].controls
         for rpy_file_control in controls:
-            rpy_file_control.visible = False if (rpy_file_control.content.content.controls[0]).value.lower().find(text_filter) == -1 else True
+            rpy_file_control.visible = False if (rpy_file_control.content.content.controls[0].controls[0]).value.lower().find(text_filter) == -1 else True
         self.main_page.controls[2].controls[0].content.content.controls[1].update()
 
     def task_filter(self, e):
@@ -1185,12 +1205,12 @@ class RPY_manager(ft.UserControl):
                         ft.Text(task_hex, visible=False),
                         ft.Text(
                             value=description,
-                            font_family="Consolas",
+                            font_family="黑体",
                             size=15,
                             width=400,
                         ),
                         ft.Text(
-                            value=str(int(acc * 10000) / 100).rjust(5) + "%",
+                            value=f'{round(acc * 100, 2)}'.rjust(5) + "%",
                             font_family="Consolas",
                             size=15,
                             width=60,
@@ -1256,7 +1276,7 @@ class RPY_manager(ft.UserControl):
             "host_name": self.user_name,
             "host_date": host_date,
             "worker_name": "merge_tasks",
-            "last_change_data": "",
+            "last_change_date": "",
             "hex": new_task_hex,
             "task_type": "merge",
             "description": description,
@@ -1333,8 +1353,8 @@ class RPY_manager(ft.UserControl):
 
         for file_name in update_rpy_set:
             rpy_obj = ver_obj.rpy_dict[file_name]
-            rpy_obj.json_info_value = ""
-            rpy_obj.rpy_info_value = ""
+            rpy_obj.json_info_value = ''
+            rpy_obj.rpy_info_value = ''
             rpy_obj.line_num = {
                 "rpy": 0,
                 "json": 0
@@ -1377,8 +1397,8 @@ class RPY_manager(ft.UserControl):
             pb.update()
             if rpy_name in self.version_list[new_version_name].rpy_dict.keys():  # 是否包含文件
                 new_rpy_obj = self.version_list[new_version_name].rpy_dict[rpy_name]
-                new_rpy_obj.json_info_value = ""
-                new_rpy_obj.rpy_info_value = ""
+                new_rpy_obj.json_info_value = ''
+                new_rpy_obj.rpy_info_value = ''
                 new_rpy_obj.line_num = {
                     "rpy": 0,
                     "json": 0
@@ -1417,7 +1437,7 @@ class RPY_manager(ft.UserControl):
             return
         running_log(f"刷新任务")
         self.selected_task = ""
-        self.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.selected_version}"
+        self.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.selected_version}"
         self.page.controls[0].controls[1].content.content.update()
 
         self.version_list[self.selected_version].scan_tasks()

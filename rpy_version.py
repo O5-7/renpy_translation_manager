@@ -30,8 +30,6 @@ class rpy_version:
         else:
             self.init_running_file()
 
-
-
         task_scan_result = self.scan_tasks()
         if task_scan_result.startswith('no_such'):
             print(task_scan_result)
@@ -47,7 +45,7 @@ class rpy_version:
         running_log(f"打开version {self.version}", self.Rm)
         self.Rm.selected_version = self.version
         self.Rm.selected_task = ""
-        self.Rm.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.version}"
+        self.Rm.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.version}"
         self.Rm.page.controls[0].controls[1].content.content.update()
 
         files_column = self.Rm.main_page.controls[2].controls[0].content.content.controls[1]
@@ -72,12 +70,19 @@ class rpy_version:
         )
         self.Rm.main_page.update()
 
+        for v_control in self.Rm.main_page.controls[1].content.controls[1].controls:
+            if v_control.content.content.controls[0].value == self.version:
+                v_control.content.border = ft.border.all(5, color="#00ff00")
+            else:
+                v_control.content.border = ft.border.all(5, color="#83ebac")
+            v_control.content.update()
+
     def build_control(self):
         rpy_v_control = ft.GestureDetector(
             content=ft.Container(
                 content=ft.Column(
                     [
-                        ft.Text(f'{self.version}', size=24 if len(self.version) <= 4 else 12, weight=ft.FontWeight.BOLD, color="#2a573b"),
+                        ft.Text(f'{self.version}', size=16 if len(self.version) <= 5 else 12, weight=ft.FontWeight.BOLD, color="#2a573b"),
                         ft.Text(f"文件:{len(self.rpy_dict)}", color="#2a573b", size=15),
                         ft.Text(f"任务:{len(self.tasks_dict)}", color="#2a573b", size=15),
                     ],
@@ -131,17 +136,23 @@ class rpy_version:
     def is_init_file(self):
         return os.path.isfile(os.path.join(self.folder_path, 'config.json'))
 
-    def read_rpy_by_rpy(self):
+    def read_rpy_by_rpy(self, pb=None):
         running_log(f"读取rpys {self.version}", self.Rm)
         self.rpy_dict = {}
-        for file_name in self.config['file_name_list']:
+        for num, file_name in enumerate(self.config['file_name_list']):
+            if pb is not None:
+                pb.value = (num + 1) / len(self.config['file_name_list'])
+                pb.update()
             rpy = RPY_File(os.path.join(self.folder_path, file_name + '.rpy'), self.Rm)
             self.rpy_dict.update({file_name: rpy})
 
-    def read_rpy_by_json(self):
+    def read_rpy_by_json(self, pb=None):
         running_log(f"读取jsons {self.version}", self.Rm)
         self.rpy_dict = {}
-        for file_name in self.config['file_name_list']:
+        for num, file_name in enumerate(self.config['file_name_list']):
+            if pb is not None:
+                pb.value = (num + 1) / len(self.config['file_name_list'])
+                pb.update()
             rpy = RPY_File(os.path.join(self.folder_path, file_name + '.json'), self.Rm)
             self.rpy_dict.update({file_name: rpy})
 
@@ -149,11 +160,11 @@ class rpy_version:
         running_log(f"rpy转移到json {self.version}", self.Rm)
 
         r2j_dialog = ft.AlertDialog(
-            title=ft.Text("rpy转移到json 请勿关闭软件!", size=20, color="#FF0000", font_family="Consolas"),
+            title=ft.Text("rpy转移到json 请勿关闭软件!", size=20, color="#FF0000", font_family="黑体"),
             actions=[
                 ft.Column(
                     [
-                        ft.Text("准备中", size=20),
+                        ft.Text("读取中...", size=20),
                         ft.ProgressBar(width=380)
                     ],
                     width=400
@@ -165,7 +176,7 @@ class rpy_version:
         r2j_dialog.open = True
         self.Rm.page.update()
 
-        self.read_rpy_by_rpy()
+        self.read_rpy_by_rpy(r2j_dialog.actions[0].controls[1])
         for rpy_num, rpy_obj in enumerate(self.rpy_dict.values()):
             r2j_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
             r2j_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)
@@ -182,11 +193,11 @@ class rpy_version:
     def json_2_rpy(self):
         running_log(f"json转移到rpy {self.version}", self.Rm)
         j2r_dialog = ft.AlertDialog(
-            title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000", font_family="Consolas"),
+            title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000",  font_family="黑体"),
             actions=[
                 ft.Column(
                     [
-                        ft.Text("准备中...", size=20),
+                        ft.Text("读取中...", size=20),
                         ft.ProgressBar(width=380)
                     ],
                     width=400
@@ -197,7 +208,7 @@ class rpy_version:
         j2r_dialog.open = True
         self.Rm.page.update()
 
-        self.read_rpy_by_json()
+        self.read_rpy_by_json(j2r_dialog.actions[0].controls[1])
         for rpy_num, rpy_obj in enumerate(self.rpy_dict.values()):
             j2r_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
             j2r_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)

@@ -1,4 +1,6 @@
 import os
+import random
+import time
 
 from RPY_manager import RPY_manager
 import flet as ft
@@ -19,18 +21,39 @@ def main(page: ft.Page):
         page.controls[1].save_app_config()
         page.window_close()
 
+    def egg(_):
+        title = page.controls[0].controls[1].content.content
+        old_title = title.value
+        egg_list = [
+            "There is something buried underneath your feet",
+            "GOD god God GOD god God GOD god God GOD god God",
+            "why everything needs to hurt so much.",
+            "JUMP JUMP JUMP JUMP JUMP JUMP JUMP JUMP JUMP",
+            "///////////////////////CONGRATULATIONS",
+            ":):):):):):):):):):):):):):):):):):)"
+        ]
+        title.value = egg_list[random.randint(0, 5)]
+        title.update()
+        time.sleep(0.001)
+        title.value = ""
+        title.update()
+
     page.add(
         ft.Row(
             [
                 ft.GestureDetector(
                     content=ft.Image(
-                        src='assets/icon.png'
+                        src='assets/icon.png',
+                        tooltip="RTM"
                     ),
-                    on_hover=lambda _: None
+                    on_tap=lambda _: os.system("start https://github.com/O5-7/renpy_translation_manager"),
+                    on_scroll=egg,
+                    multi_tap_touches=23
                 ),
                 ft.WindowDragArea(
                     ft.Container(
-                        ft.Text(os.getcwd(), color="#000000", size=30, offset=(0, -0.1)),
+                        ft.Text("", color="#000000", size=30, offset=(0, -0.1)),
+                        # ft.Text(os.getcwd(), color="#000000", size=30, offset=(0, -0.1)),
                         bgcolor="#FFFFFF",
                         height=40,
                     ),

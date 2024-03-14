@@ -115,6 +115,7 @@ class RPY_File:
             if string_index >= len(string_lines):
                 break
             if string_lines[string_index].startswith("translate"):
+                self.file_json["language"] = string_lines[string_index].split(' ')[1]
                 self.file_json['strings'].append([])
                 string_index += 1
             else:
@@ -171,16 +172,31 @@ class RPY_File:
     def build_control(self):
         rpy_file_control = ft.GestureDetector(
             content=ft.Container(
-                content=ft.Column(
+                ft.Row(
                     [
-                        ft.Text(f" {self.file_name}", size=18, ),
-                        ft.Text(f" 事件:{len(self.file_json['dialogue'])}".ljust(12) + f"strings:{sum([len(strings) for strings in self.file_json['strings']])}", size=15, )
+                        ft.Column(
+                            [
+                                ft.Text(f" {self.file_name}", size=18, ),
+                                ft.Text(f" 事件:{len(self.file_json['dialogue'])}".ljust(8) + f"strings:{sum([len(strings) for strings in self.file_json['strings']])}", size=15)
+                            ],
+                            spacing=0,
+                            alignment=ft.MainAxisAlignment.CENTER,
+                            horizontal_alignment=ft.CrossAxisAlignment.START,
+                        ),
+                        ft.IconButton(
+                            icon=ft.icons.FILE_OPEN_SHARP,
+                            style=ft.ButtonStyle(
+                                shape={
+                                    ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0)
+                                },
+                            ),
+                            icon_size=30,
+                            on_click=lambda _: os.system(f"notepad {self.file_path}".replace(".json", ".rpy"))
+                        )
                     ],
-                    spacing=0,
-                    alignment=ft.MainAxisAlignment.CENTER,
-                    horizontal_alignment=ft.CrossAxisAlignment.START
+                    width=200,
+                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                 ),
-
                 width=200,
                 height=60,
                 border=ft.border.all(5, color="#8aabeb"),
@@ -195,7 +211,7 @@ class RPY_File:
 
     def show_file_info(self, _):
         running_log(f"打开rpy {self.file_name}", self.Rm)
-        self.Rm.page.controls[0].controls[1].content.content.value = f"RPY Manager >>> {self.Rm.selected_version} >> {self.file_name}"
+        self.Rm.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.Rm.selected_version} >> {self.file_name}"
         self.Rm.page.controls[0].controls[1].content.content.update()
 
         for file_name, file in self.Rm.version_list[self.Rm.selected_version].rpy_dict.items():
@@ -239,7 +255,7 @@ class RPY_File:
                             content=ft.Text("json", size=30, offset=(0, -0.1)),
                             style=ft.ButtonStyle(
                                 color="#ebb67d",
-                                bgcolor="#7d6315",
+                                bgcolor="#7d5c17",
                                 side={
                                     ft.MaterialState.DEFAULT: ft.BorderSide(3, "#ff7f00")
                                 },
@@ -256,7 +272,7 @@ class RPY_File:
                             content=ft.Text("rpy", size=30, offset=(0, -0.1)),
                             style=ft.ButtonStyle(
                                 color="#ebb67d",
-                                bgcolor="#7d6315",
+                                bgcolor="#7d5c17",
                                 side={
                                     ft.MaterialState.DEFAULT: ft.BorderSide(3, "#ff7f00")
                                 },
@@ -280,8 +296,7 @@ class RPY_File:
                                         value=self.rpy_info_value,
                                         color="#000000",
                                         size=15,
-                                        font_family="Consolas",
-                                        selectable=True
+                                        font_family="黑体"
                                     ),
                                     bgcolor="#eeeeee"
                                 )
@@ -301,19 +316,25 @@ class RPY_File:
             ],
             spacing=0,
         )
-
-        text_con.update()
+        running_log("rpy计算完成 更新到page")
+        try:
+            text_con.update()
+        except AssertionError:
+            pass
+        running_log("更新成功")
 
     def update_json_txt(self):
+        running_log(f"更新 {self.file_name} 的json_info_value")
         self.json_info_value = json.dumps(self.file_json, indent=4, ensure_ascii=False)
         self.line_num["json"] = len(self.json_info_value.split('\n'))
 
     def update_rpy_txt(self, pb=None):
+        running_log(f"更新 {self.file_name} 的rpy_info_value")
         progress_len = len(self.file_json['dialogue']) + len(self.file_json['strings'])
         progress_new = 0
         for event, lines in self.file_json['dialogue'].items():
-            if pb is not None:
-                progress_new += 1
+            progress_new += 1
+            if pb is not None and progress_new % 1000 == 0:
                 pb.value = progress_new / progress_len
                 try:
                     pb.update()
@@ -332,10 +353,13 @@ class RPY_File:
                 self.rpy_info_value += line
 
         for strings in self.file_json['strings']:
-            if pb is not None:
-                progress_new += 1
+            progress_new += 1
+            if pb is not None and progress_new % 1000 == 0:
                 pb.value = progress_new / progress_len
-                pb.update()
+                try:
+                    pb.update()
+                except AssertionError:
+                    return
             self.rpy_info_value += 'translate {} strings:\n\n'.format(self.file_json['language'])
             for string in strings:
                 string_str = """    # {script}\n    old "{old}"\n    new "{new}"\n\n""".format(
@@ -350,26 +374,31 @@ class RPY_File:
         for line_num, line in enumerate(rpy_info_value_split):
             info_value.append(f"{str(line_num).ljust(6, ' ')} | " + line)
         self.rpy_info_value = "\n".join(info_value)
-
         self.line_num["rpy"] = len(self.rpy_info_value.split('\n'))
 
     def switch_to_json_info(self, _):
+        running_log(f"显示 {self.file_name} 的json")
         if self.json_info_value == "":
             self.update_json_txt()
         self.showing_type = "json"
         text_con = self.Rm.main_page.controls[3]
         text_control = text_con.content.controls[1].controls[0].controls[0].content
         text_control.value = self.json_info_value
+        running_log("json计算完成 更新到page")
         text_control.update()
+        running_log("更新成功")
 
     def switch_to_rpy_info(self, _):
+        running_log(f"显示 {self.file_name} 的rpy")
         if self.rpy_info_value == "":
             self.update_rpy_txt()
         self.showing_type = "rpy"
         text_con = self.Rm.main_page.controls[3]
         text_control = text_con.content.controls[1].controls[0].controls[0].content
         text_control.value = self.rpy_info_value
+        running_log("rpy计算完成 更新到page")
         text_control.update()
+        running_log("更新成功")
 
     def jump_to(self, e):
         line_txt = e.control.value
@@ -406,3 +435,7 @@ class RPY_File:
             line_textfield = self.Rm.main_page.controls[3].content.controls[0].controls[0]
             line_textfield.value = str(search_line)
             line_textfield.update()
+
+
+if __name__ == '__main__':
+    RPY_File(r"E:\恋爱课程LessonsInLove0.29\0.38翻译文件（还没有整合）\chap3.rpy", None)

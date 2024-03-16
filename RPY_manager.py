@@ -110,10 +110,31 @@ class RPY_manager(ft.UserControl):
             self.version_add_dialog.open = False
             self.version_add_dialog.update()
 
+        def close_version_delete_dialog(_):
+            self.version_delete_dialog.open = False
+            self.version_delete_dialog.update()
+
+        def close_v2v_transfer_dialog(_):
+            self.v2v_transfer_dialog.open = False
+            self.v2v_transfer_dialog.update()
+
+        def close_add_task_dialog(_):
+            self.add_task_dialog.open = False
+            self.add_task_dialog.update()
+
+        def close_t2j_transfer_dialog(_):
+            self.t2j_transfer_dialog.open = False
+            self.t2j_transfer_dialog.update()
+
+        def close_merge_tasks_dialog(_):
+            self.merge_tasks_dialog.open = False
+            self.merge_tasks_dialog.update()
+
         self.page.overlay.append(self.file_picker)
         # version文件夹选择dialog
         self.version_add_dialog = ft.AlertDialog(
             title=ft.Text("选择rpy文件所在的文件夹", size=20),
+            modal=True,
             actions=[
                 ft.Container(
                     content=ft.Column(
@@ -139,8 +160,8 @@ class RPY_manager(ft.UserControl):
                             ),
                             ft.Row(
                                 [
-                                    ft.TextButton("添加", icon=ft.icons.CHECK, on_click=add_version),
-                                    ft.TextButton("取消", icon=ft.icons.CANCEL, icon_color="#ba1a1a", on_click=close_version_add_dialog)
+                                    ft.TextButton("添加", icon=ft.icons.CHECK_ROUNDED, on_click=add_version),
+                                    ft.TextButton("取消", icon=ft.icons.CANCEL_ROUNDED, icon_color="#ba1a1a", on_click=close_version_add_dialog)
                                 ]
                             )
                         ]
@@ -152,6 +173,7 @@ class RPY_manager(ft.UserControl):
 
         self.version_delete_dialog = ft.AlertDialog(
             title=ft.Text("从列表中删除version", size=20),
+            modal=True,
             actions=[
                 ft.Column(
                     [
@@ -161,11 +183,22 @@ class RPY_manager(ft.UserControl):
                             height=250,
                             scroll=ft.ScrollMode.ALWAYS
                         ),
-                        ft.TextButton(
-                            icon=ft.icons.CHECK_ROUNDED,
-                            text="确认删除",
-                            on_click=self.delete_version_dialog
+                        ft.Row(
+                            [
+                                ft.TextButton(
+                                    icon=ft.icons.CHECK_ROUNDED,
+                                    text="确认删除",
+                                    on_click=self.delete_version_dialog
+                                ),
+                                ft.TextButton(
+                                    icon=ft.icons.CANCEL_ROUNDED,
+                                    icon_color="#FF0000",
+                                    text="取消",
+                                    on_click=close_version_delete_dialog
+                                ),
+                            ]
                         )
+
                     ]
                 )
             ]
@@ -173,6 +206,7 @@ class RPY_manager(ft.UserControl):
 
         self.add_task_dialog = ft.AlertDialog(
             title=ft.Text("新建任务", size=20),
+            modal=True,
             actions=[
                 ft.Container(
                     content=ft.Column(
@@ -209,7 +243,14 @@ class RPY_manager(ft.UserControl):
                                                     hint_text="输入任务描述",
                                                     on_change=self.check_task_description
                                                 ),
-                                                ft.TextButton("添加", icon=ft.icons.CHECK, on_click=self.add_modify_task),
+                                                ft.Row(
+                                                    [
+                                                        ft.TextButton("添加", icon=ft.icons.CHECK_ROUNDED, on_click=self.add_modify_task),
+                                                        ft.TextButton("取消", icon=ft.icons.CANCEL_ROUNDED, icon_color="#FF0000", on_click=close_add_task_dialog)
+                                                    ],
+                                                    alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                                                )
+
                                             ],
                                             height=452,
                                             width=700,
@@ -237,9 +278,9 @@ class RPY_manager(ft.UserControl):
                                                 ),
                                                 ft.Row(
                                                     controls=[
-                                                        ft.TextButton("计算", icon=ft.icons.LIGHTBULB, icon_color="#ff453a", on_click=self.update_task_info),
-                                                        ft.TextButton("添加", icon=ft.icons.CHECK, on_click=self.add_update_task),
-
+                                                        ft.TextButton("计算", icon=ft.icons.LIGHTBULB_ROUNDED, icon_color="#ff453a", on_click=self.update_task_info),
+                                                        ft.TextButton("添加", icon=ft.icons.CHECK_ROUNDED, on_click=self.add_update_task),
+                                                        ft.TextButton("取消", icon=ft.icons.CANCEL_ROUNDED, icon_color="#FF0000", on_click=close_add_task_dialog)
                                                     ]
                                                 ),
                                                 ft.Column(
@@ -272,6 +313,7 @@ class RPY_manager(ft.UserControl):
 
         self.setting_config_dialog = ft.AlertDialog(
             title=ft.Text("设置", size=20),
+            modal=True,
             actions=[
                 ft.Container(
                     ft.Column(
@@ -327,6 +369,7 @@ class RPY_manager(ft.UserControl):
 
         self.t2j_transfer_dialog = ft.AlertDialog(
             title=ft.Text("转移任务翻译", size=20),
+            modal=True,
             actions=[
                 ft.Column(
                     [
@@ -334,11 +377,23 @@ class RPY_manager(ft.UserControl):
                             height=450,
                             scroll=ft.ScrollMode.ALWAYS
                         ),
-                        ft.TextButton(
-                            icon=ft.icons.CHECK_ROUNDED,
-                            text="转移翻译到json",
-                            on_click=self.transfer_task_result_to_json_file
+                        ft.Row(
+                            [
+                                ft.TextButton(
+                                    icon=ft.icons.CHECK_ROUNDED,
+                                    text="转移翻译到json",
+                                    on_click=self.transfer_task_result_to_json_file
+                                ),
+                                ft.TextButton(
+                                    icon=ft.icons.CANCEL_ROUNDED,
+                                    icon_color="#FF0000",
+                                    text="取消",
+                                    on_click=close_t2j_transfer_dialog
+                                ),
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                         )
+
                     ],
                     height=500,
                     width=600,
@@ -348,14 +403,15 @@ class RPY_manager(ft.UserControl):
 
         self.v2v_transfer_dialog = ft.AlertDialog(
             title=ft.Text("版本翻译转移", size=20),
+            modal=True,
             actions=[
                 ft.Column(
                     [
                         ft.Row(
                             [
-                                ft.Dropdown(width=230),
+                                ft.Dropdown(width=270),
                                 ft.Icon(ft.icons.ARROW_FORWARD_ROUNDED),
-                                ft.Dropdown(width=230),
+                                ft.Dropdown(width=270),
                             ]
                         ),
                         ft.Row(
@@ -368,19 +424,30 @@ class RPY_manager(ft.UserControl):
                                 ft.Checkbox(
                                     label="覆盖",
                                     value=False
-                                )
+                                ),
+                                ft.Container(
+                                    height=1,
+                                    width=200,
+                                ),
+                                ft.TextButton(
+                                    icon=ft.icons.CANCEL_ROUNDED,
+                                    icon_color="#FF0000",
+                                    text="取消",
+                                    on_click=close_v2v_transfer_dialog
+                                ),
                             ]
                         ),
                         ft.ProgressBar(width=510, height=20)
                     ],
                     spacing=5,
-                    width=500
+                    width=600,
                 ),
             ],
         )
 
         self.merge_tasks_dialog = ft.AlertDialog(
             title=ft.Text("选择要合并的任务", size=20),
+            modal=True,
             actions=[
                 ft.Column(
                     [
@@ -389,11 +456,23 @@ class RPY_manager(ft.UserControl):
                             scroll=ft.ScrollMode.ALWAYS
                         ),
                         ft.TextField(label="新描述"),
-                        ft.TextButton(
-                            icon=ft.icons.CALL_MERGE_SHARP,
-                            text="合并任务",
-                            on_click=self.merge_tasks
+                        ft.Row(
+                            [
+                                ft.TextButton(
+                                    icon=ft.icons.CALL_MERGE_ROUNDED,
+                                    text="合并任务",
+                                    on_click=self.merge_tasks
+                                ),
+                                ft.TextButton(
+                                    icon=ft.icons.CANCEL_ROUNDED,
+                                    icon_color="#FF0000",
+                                    text="取消",
+                                    on_click=close_merge_tasks_dialog
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                         )
+
                     ],
                     height=500,
                     width=600,
@@ -432,6 +511,17 @@ class RPY_manager(ft.UserControl):
                             ),
                             on_click=lambda _: os.system(f"explorer {self.temp_path}"),
                             tooltip="打开缓存文件夹"
+                        ),
+                        ft.IconButton(
+                            icon=ft.icons.DEVELOPER_MODE_ROUNDED,
+                            icon_color="#eb9da5",
+                            icon_size=34,
+                            style=ft.ButtonStyle(
+                                shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=5)},
+                                bgcolor={ft.MaterialState.DEFAULT: "#71363c"},
+                            ),
+                            on_click=lambda _: os.system(f"notepad {os.path.join(self.temp_path, 'out.log')}") if os.path.isfile(os.path.join(self.temp_path, 'out.log')) else lambda _: None,
+                            tooltip="打开运行日志"
                         ),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -891,6 +981,14 @@ class RPY_manager(ft.UserControl):
         event_name = add_modify_task_3_dropdown[2].value
         dialogue_name = add_modify_task_3_dropdown[3].value[:8]
         description = add_modify_task_3_dropdown[4].value
+        if description == "" or description is None:
+            add_modify_task_3_dropdown[4].error_text = "请输入描述"
+            add_modify_task_3_dropdown[4].update()
+            return
+        else:
+            add_modify_task_3_dropdown[4].error_text = ""
+            add_modify_task_3_dropdown[4].update()
+
         if any([i is None for i in [rpy_file_name, event_name, dialogue_name, description]]):
             return
 
@@ -1266,7 +1364,12 @@ class RPY_manager(ft.UserControl):
         task_name = "_".join(need_merge_list)
 
         if description == "":
+            self.merge_tasks_dialog.actions[0].controls[1].error_text = "请输入描述"
+            self.merge_tasks_dialog.actions[0].controls[1].update()
             return
+        else:
+            self.merge_tasks_dialog.actions[0].controls[1].error_text = ""
+            self.merge_tasks_dialog.actions[0].controls[1].update()
         new_task_hex = hashlib.md5(f"{task_name}{description}{host_date}".encode(encoding='UTF-8')).hexdigest()
         new_task_hex = new_task_hex[:8]
         task_file_name = f"{description}@{new_task_hex}.json"
@@ -1329,8 +1432,8 @@ class RPY_manager(ft.UserControl):
         self.page.update()
 
     def transfer_task_result_to_json_file(self, _):
-        running_log("转移任务翻译到json", self)
         check_boxes_column = self.t2j_transfer_dialog.actions[0].controls[0]
+        running_log(f"转移{len(check_boxes_column.controls)}个任务翻译到json", self)
         ver_obj = self.version_list[self.selected_version]
         update_rpy_set = set()
         for row in check_boxes_column.controls:

@@ -161,6 +161,7 @@ class rpy_version:
 
         r2j_dialog = ft.AlertDialog(
             title=ft.Text("rpy转移到json 请勿关闭软件!", size=20, color="#FF0000", font_family="黑体"),
+            modal=True,
             actions=[
                 ft.Column(
                     [
@@ -194,6 +195,7 @@ class rpy_version:
         running_log(f"json转移到rpy {self.version}", self.Rm)
         j2r_dialog = ft.AlertDialog(
             title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000",  font_family="黑体"),
+            modal=True,
             actions=[
                 ft.Column(
                     [

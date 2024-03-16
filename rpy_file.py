@@ -3,7 +3,7 @@ import json
 import flet as ft
 from running_log import running_log
 
-line_height = 23
+line_height = 21
 
 
 class RPY_File:

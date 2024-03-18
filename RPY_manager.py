@@ -92,6 +92,7 @@ class RPY_manager(ft.UserControl):
             Column_controls = self.version_add_dialog.actions[0].content.controls
             path = Column_controls[0].controls[0].value
             if not os.path.isdir(path):
+                running_log(f"{path} 不是一个文件夹或不存在")
                 return
             name = Column_controls[1].value
             running_log(f"添加version {name}", self)
@@ -100,6 +101,10 @@ class RPY_manager(ft.UserControl):
             update_version_UI_list(None)
             close_version_add_dialog(None)
             Column_controls[0].controls[0].value = Column_controls[1].value = ''
+
+            if not self.version_list[name].success:
+                # 有错误文件 不做保存
+                return
 
             self.app_config["default_versions"] = {}
             for version_name, version_obj in self.version_list.items():

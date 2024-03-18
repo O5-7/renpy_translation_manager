@@ -22,6 +22,7 @@ class RPY_File:
             "json": 0
         }
         self.showing_type = ""
+        self.success: bool = True
 
         self.file_json = {
             'name': self.file_name,
@@ -79,8 +80,28 @@ class RPY_File:
         for dialogue_index in range(len(dialogue_lines) // 4):
             script = dialogue_lines[dialogue_index * 4][2:]
             _ = dialogue_lines[dialogue_index * 4 + 1]
-            _, language, event_and_hex = dialogue_lines[dialogue_index * 4 + 1].split(' ')
-            event_name, dialogue_hex = event_and_hex[:-1].split('_', maxsplit=1)
+            try:
+                _, language, event_and_hex = dialogue_lines[dialogue_index * 4 + 1].split(' ')
+            except ValueError:
+                running_log(f"ERROR! 解析{self.file_name}时 {dialogue_lines[dialogue_index * 4 + 1]}解析失败")
+                for offset in range(-2, 3):
+                    try:
+                        print(f'\t|{dialogue_lines[dialogue_index * 4 + 1 + offset]}', end=" <<< 错误所在\n" if offset == 0 else "\n")
+                    except IndexError:
+                        pass
+                self.success = False
+                return
+            try:
+                event_name, dialogue_hex = event_and_hex[:-1].split('_', maxsplit=1)
+            except ValueError:
+                running_log(f"ERROR! 解析{self.file_name}时 {event_and_hex[:-1]}解析失败")
+                for offset in range(-2, 3):
+                    try:
+                        print(f'\t|{dialogue_lines[dialogue_index * 4 + 1 + offset]}', end=" <<< 错误所在\n" if offset == 0 else "\n")
+                    except IndexError:
+                        pass
+                self.success = False
+                return
             origin_line = dialogue_lines[dialogue_index * 4 + 2][5:]
             origin_start = origin_line.find('"')
             speaker = '<>' if origin_start == 1 else origin_line[1:origin_start - 1]
@@ -119,15 +140,25 @@ class RPY_File:
                 self.file_json['strings'].append([])
                 string_index += 1
             else:
-                script = string_lines[string_index][6:]
-                old = string_lines[string_index + 1][9:-1]
-                new = string_lines[string_index + 2][9:-1]
-                self.file_json['strings'][-1].append({
-                    "script": script,
-                    "old": old,
-                    "new": new
-                })
-                string_index += 3
+                try:
+                    script = string_lines[string_index][6:]
+                    old = string_lines[string_index + 1][9:-1]
+                    new = string_lines[string_index + 2][9:-1]
+                    self.file_json['strings'][-1].append({
+                        "script": script,
+                        "old": old,
+                        "new": new
+                    })
+                    string_index += 3
+                except IndexError:
+                    running_log(f"ERROR! 解析 {self.file_name} strings部分时解析失败")
+                    for offset in range(-2, 3):
+                        try:
+                            print(f"\t|{string_lines[string_index + 2 + offset]}")
+                        except IndexError:
+                            pass
+                    self.success = False
+                    return
 
     def read_json(self):
         # running_log(f"读取json {self.file_name}", self.Rm)
@@ -177,7 +208,11 @@ class RPY_File:
                         ft.Column(
                             [
                                 ft.Text(f" {self.file_name}", size=18, ),
-                                ft.Text(f" 事件:{len(self.file_json['dialogue'])}".ljust(8) + f"strings:{sum([len(strings) for strings in self.file_json['strings']])}", size=15)
+                                ft.Text(
+                                    f" 事件:{len(self.file_json['dialogue'])}".ljust(8) + f"strings:{sum([len(strings) for strings in self.file_json['strings']])}" if self.success else " 读取错误",
+                                    size=15,
+                                    color="" if self.success else "#FF0000"
+                                )
                             ],
                             spacing=0,
                             alignment=ft.MainAxisAlignment.CENTER,
@@ -199,12 +234,13 @@ class RPY_File:
                 ),
                 width=200,
                 height=60,
-                border=ft.border.all(5, color="#8aabeb"),
+                border=ft.border.all(5, color="#8aabeb") if self.success else ft.border.all(5, color="#FF0000"),
                 border_radius=5,
                 bgcolor="#a7c2de",
                 ink=True,
+                tooltip=self.file_name
             ),
-            on_double_tap=self.show_file_info
+            on_double_tap=self.show_file_info if self.success else lambda _: None
         )
 
         return rpy_file_control
@@ -438,4 +474,4 @@ class RPY_File:
 
 
 if __name__ == '__main__':
-    RPY_File(r"E:\恋爱课程LessonsInLove0.29\0.38翻译文件（还没有整合）\chap3.rpy", None)
+    RPY_File(r"E:\恋爱课程LessonsInLove0.29\0.38翻译文件（还没有整合）\AmiEvents.rpy", None)

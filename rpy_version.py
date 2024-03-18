@@ -19,11 +19,9 @@ class rpy_version:
         self.rpy_dict = {}  # 文件名:文件实例
         self.config = {}
         self.tasks_dict = {}
-        """
-        version: 版本
-        file_name_list: 文件列表
-        event_list: 事件列表
-        """
+
+        self.success: bool = True
+
         if self.is_init_file():
             self.config = json.load(open(os.path.join(self.folder_path, 'config.json'), mode="r", encoding='utf-8'))
             self.read_rpy_by_json()
@@ -32,7 +30,7 @@ class rpy_version:
 
         task_scan_result = self.scan_tasks()
         if task_scan_result.startswith('no_such'):
-            print(task_scan_result)
+            # print(task_scan_result)
             # TODO: tasks扫描错误
             pass
 
@@ -91,7 +89,7 @@ class rpy_version:
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
                 ),
                 bgcolor="#b7ebc1",
-                border=ft.border.all(5, color="#83ebac"),
+                border=ft.border.all(5, color="#83ebac") if self.success else ft.border.all(5, color="#FF0000"),
                 border_radius=5,
                 width=100,
                 height=100,
@@ -107,6 +105,11 @@ class rpy_version:
         file_name_list = [file_name[:-4] for file_name in os.listdir(self.folder_path) if file_name.endswith('.rpy')]
         self.config.update({"file_name_list": file_name_list})
         self.read_rpy_by_rpy()
+        if not all([rpy_obj.success for rpy_obj in self.rpy_dict.values()]):
+            running_log(f"{self.version}: {self.folder_path} 存在格式错误文件 拒绝初始化")
+            self.success = False
+            return
+
         event_list = {}
         for file_name in self.config['file_name_list']:
             event_list.update({file_name: list(self.rpy_dict[file_name].file_json['dialogue'].keys())})
@@ -194,7 +197,7 @@ class rpy_version:
     def json_2_rpy(self):
         running_log(f"json转移到rpy {self.version}", self.Rm)
         j2r_dialog = ft.AlertDialog(
-            title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000",  font_family="黑体"),
+            title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000", font_family="黑体"),
             modal=True,
             actions=[
                 ft.Column(
@@ -228,6 +231,7 @@ class rpy_version:
 
         tasks_folder_path = os.path.join(self.folder_path, 'tasks')
         if not os.path.isdir(tasks_folder_path):
+            running_log(f"任务文件夹 {tasks_folder_path} 不存在")
             return 'no_such_tasks'
         task_file_names = os.listdir(tasks_folder_path)
         running_log(f"扫描tasks {task_file_names}", self.Rm)
@@ -239,6 +243,7 @@ class rpy_version:
             task_content = task_obj.task_content
             for file_name, events in task_content.items():
                 if file_name not in self.rpy_dict.keys():
+                    running_log(f"任务中提及的文件 {file_name} 不存在")
                     return f'no_such_file: {file_name}'
                 for event_name, hexs in events.items():
                     if event_name == 'strings':
@@ -249,15 +254,18 @@ class rpy_version:
 
                         for strings_hex in hexs:
                             if strings_hex != "ALL" and strings_hex not in all_strings_hex:
+                                running_log(f"任务中提及的string_hex {strings_hex} 不存在")
                                 return f'no_such_string: {strings_hex}'
                         continue
 
                     if event_name not in self.rpy_dict[file_name].file_json["dialogue"].keys():
+                        running_log(f"任务中提及的事件 {event_name} 不存在")
                         return f'no_such_event :{event_name}'
                     for line_hex in hexs:
                         if line_hex == "ALL":
                             break
                         elif line_hex not in self.rpy_dict[file_name].file_json["dialogue"][event_name].keys():
+                            running_log(f"任务中提及的line_hex {line_hex} 不存在")
                             return f'no_such_line: {line_hex}'
 
             self.tasks_dict.update({task_hex: task_obj})

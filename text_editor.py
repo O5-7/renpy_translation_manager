@@ -44,7 +44,7 @@ class text_editor:
         else:
             tr_dict = rpy_obj.file_json["dialogue"][self.event_name][self.dialogue]
 
-            self.speaker = self.Rm.name_dict[tr_dict["speaker"]][0] if tr_dict["speaker"] in self.Rm.name_dict.keys() else "<未知的角色 请检查设置中的游戏根目录以及版本>"
+            self.speaker = self.Rm.name_dict[tr_dict["speaker"]][0] if tr_dict["speaker"] in self.Rm.name_dict.keys() else f"{tr_dict['speaker']} <未知的角色 请检查设置中的游戏根目录>"
             self.speaker_color = self.Rm.name_dict[tr_dict["speaker"]][1] if tr_dict["speaker"] in self.Rm.name_dict.keys() else ""
             if tr_dict["speaker"] == "<>":
                 self.speaker = ""
@@ -57,12 +57,12 @@ class text_editor:
             ft.Column(
                 [
                     ft.Text(self.speaker, color=self.speaker_color, font_family="黑体", size=20, ),
-                    ft.Text(self.origin, font_family="黑体", size=20, selectable=True),
-                    ft.Text(self.hint, font_family="黑体", size=17, selectable=True, color="#878787"),
+                    ft.Text(self.origin, font_family="Hans", size=20, selectable=True),
+                    ft.Text(self.hint, font_family="Hans", size=17, selectable=True, color="#878787"),
                     ft.Row(
                         [
                             ft.TextField(
-                                width=752,
+                                width=740,
                                 on_change=self.update_in_memory,
                                 text_size=17,
                                 border=ft.InputBorder.UNDERLINE,

@@ -7,6 +7,7 @@ import time
 
 import flet as ft
 from running_log import running_log
+
 info = list("word,phonetic,definition,translation,pos,collins,oxford,tag,bnc,frq,exchange,detail,audio".split(","))
 
 
@@ -28,7 +29,7 @@ class En_dict:
 
     def En_dict(self, _):
         En_input = self.control.content.controls[0].value.lower()
-        running_log(f"查询字典 {En_input}", self.Rm)
+        running_log(f"查询字典 {En_input}")
         en_description = self.control.content.controls[1].controls[2]
         cn_description = self.control.content.controls[1].controls[0]
         if En_input not in self.dict_json.keys():
@@ -36,7 +37,7 @@ class En_dict:
             cn_description.value = ""
             en_description.update()
             cn_description.update()
-            running_log(f"查询失败", self.Rm)
+            running_log(f"查询失败")
             return
         line_num = self.dict_json[En_input] + 1
         with open("assets/ecdict.csv", mode="r", encoding="utf-8") as F:
@@ -47,7 +48,7 @@ class En_dict:
             cn_description.value = word_line[3].replace("\\n", "\n\n")
             en_description.update()
             cn_description.update()
-            running_log(f"查询成功", self.Rm)
+            running_log(f"查询成功")
 
     def build_control(self):
         out_control = ft.Container(
@@ -66,27 +67,30 @@ class En_dict:
                     ),
                     ft.Column(
                         [
-                            ft.Text(width=160, selectable=True),
+                            ft.Text(width=160, selectable=True, font_family="Hans"),
                             ft.Divider(),
-                            ft.Text(width=160, selectable=True),
+                            ft.Text(width=160, selectable=True, font_family="Hans"),
                         ],
                         spacing=0,
                         scroll=ft.ScrollMode.ALWAYS,
-                        height=705,
+                        height=727,
                     ),
                     ft.TextButton(
-                        height=100,
+                        height=75,
                         width=150,
-                        icon=ft.icons.SAVE_ROUNDED,
-                        icon_color="#FF7F00",
-                        text="保存到文件",
+                        content=ft.Text(
+                            value="保存到文件",
+                            font_family="Hans",
+                            size=20,
+                            color="#FF7F00"
+                        ),
                         style=ft.ButtonStyle(
                             shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=5)},
                             bgcolor="#FFFFFF",
                             side={ft.MaterialState.DEFAULT: ft.BorderSide(5, "#FF7F00")},
                             color="#FF7F00"
                         ),
-                        on_click=self.save_to_file
+                        on_click=self.save_to_file,
                     ),
                     ft.ProgressBar(
                         value=0,
@@ -100,12 +104,14 @@ class En_dict:
                 spacing=5
             ),
             bgcolor="#eeeeee",
+            border_radius=0,
+            border=ft.border.all(2, "#000000")
         )
 
         return out_control
 
     def save_to_file(self, _):
-        running_log(f"尝试保存任务", self.Rm)
+        running_log(f"尝试保存任务")
         if not self.is_auto_save_on:
             self.is_auto_save_on = True
             self.auto_save_th.start()
@@ -120,7 +126,7 @@ class En_dict:
                 c.visible = True
             task_column.update()
 
-        running_log(f"保存任务 {task.description} 到本地", self.Rm)
+        running_log(f"保存任务 {self.Rm.selected_version} >>> {task.description} 到本地")
         task.write()
 
 

@@ -238,7 +238,7 @@ class RPY_manager(ft.UserControl):
                                                     on_change=self.update_dialogue_dropdown
                                                 ),
                                                 ft.Dropdown(
-                                                    width=450,
+                                                    width=500,
                                                     label="对话",
                                                     options=[],
                                                 ),
@@ -772,7 +772,7 @@ class RPY_manager(ft.UserControl):
         TEXT_editor = ft.Container(
             ft.Container(width=1060, height=890, bgcolor="#eeeeee"),
             border_radius=5,
-            border=ft.border.all(5, "#ff7f00")
+            border=ft.border.all(5, "#ff7f00"),
         )
         self.main_page = ft.Row(
             [
@@ -956,7 +956,7 @@ class RPY_manager(ft.UserControl):
         selected_event = event_dropdown.value
         if not selected_event == "strings":
             dialogue_dropdown.options = [
-                ft.dropdown.Option(f"{k}: {v['origin'][:40]}")
+                ft.dropdown.Option(f"{k}|  {v['speaker']}: {v['origin'][:40]}")
                 for k, v
                 in self.version_list[self.selected_version].rpy_dict[rpy_file_dropdown.value].file_json['dialogue'][selected_event].items()
             ]
@@ -970,14 +970,14 @@ class RPY_manager(ft.UserControl):
                 for string in strings:
                     dialogue = hashlib.md5(string["old"].encode("utf-8")).hexdigest()[:8]
                     dialogue_dropdown.options.append(
-                        ft.dropdown.Option(f"{dialogue}: {string['old'][:40]}")
+                        ft.dropdown.Option(f"{dialogue}: {string['old'][:40]}", )
                     )
         dialogue_dropdown.update()
 
     def check_task_description(self, _):
         task_description_textfield = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[4]
         if task_description_textfield.value.find("@") != -1:
-            task_description_textfield.error_text = "不要包含@"
+            task_description_textfield.error_text = "不能包含@符号"
         else:
             task_description_textfield.error_text = ""
         task_description_textfield.update()

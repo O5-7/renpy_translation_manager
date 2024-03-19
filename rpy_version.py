@@ -40,7 +40,7 @@ class rpy_version:
         self.control = self.build_control()
 
     def switch_files_and_tasks_column(self, _):
-        running_log(f"打开version {self.version}", self.Rm)
+        running_log(f"打开version {self.version}")
         self.Rm.selected_version = self.version
         self.Rm.selected_task = ""
         self.Rm.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.version}"
@@ -100,7 +100,7 @@ class rpy_version:
         return rpy_v_control
 
     def init_running_file(self):
-        running_log(f"初始化文件 {self.version} {self.folder_path}", self.Rm)
+        running_log(f"初始化文件 {self.version} {self.folder_path}")
         self.config.update({'version': self.version})
         file_name_list = [file_name[:-4] for file_name in os.listdir(self.folder_path) if file_name.endswith('.rpy')]
         self.config.update({"file_name_list": file_name_list})
@@ -140,7 +140,7 @@ class rpy_version:
         return os.path.isfile(os.path.join(self.folder_path, 'config.json'))
 
     def read_rpy_by_rpy(self, pb=None):
-        running_log(f"读取rpys {self.version}", self.Rm)
+        running_log(f"读取rpys {self.version}")
         self.rpy_dict = {}
         for num, file_name in enumerate(self.config['file_name_list']):
             if pb is not None:
@@ -150,7 +150,7 @@ class rpy_version:
             self.rpy_dict.update({file_name: rpy})
 
     def read_rpy_by_json(self, pb=None):
-        running_log(f"读取jsons {self.version}", self.Rm)
+        running_log(f"读取jsons {self.version}")
         self.rpy_dict = {}
         for num, file_name in enumerate(self.config['file_name_list']):
             if pb is not None:
@@ -160,7 +160,7 @@ class rpy_version:
             self.rpy_dict.update({file_name: rpy})
 
     def rpy_2_json(self):
-        running_log(f"rpy转移到json {self.version}", self.Rm)
+        running_log(f"rpy转移到json {self.version}")
 
         r2j_dialog = ft.AlertDialog(
             title=ft.Text("rpy转移到json 请勿关闭软件!", size=20, color="#FF0000", font_family="黑体"),
@@ -185,17 +185,21 @@ class rpy_version:
             r2j_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
             r2j_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)
             r2j_dialog.update()
-            rpy_obj.write_json(self.folder_path)
+            if self.success:
+                rpy_obj.write_json(self.folder_path)
 
         self.switch_files_and_tasks_column(None)
 
         r2j_dialog.open = False
         self.Rm.page.update()
 
-        running_log(f"转移成功 {self.version}", self.Rm)
+        running_log(f"转移成功 {self.version}")
 
     def json_2_rpy(self):
-        running_log(f"json转移到rpy {self.version}", self.Rm)
+        running_log(f"json转移到rpy {self.version}")
+        if not self.success:
+            running_log("存在解析失败的rpy,操作不允许")
+            return
         j2r_dialog = ft.AlertDialog(
             title=ft.Text("json转移到rpy 请勿关闭软件!", size=20, color="#FF0000", font_family="黑体"),
             modal=True,
@@ -223,10 +227,10 @@ class rpy_version:
         j2r_dialog.open = False
         self.Rm.page.update()
 
-        running_log(f"转移成功 {self.version}", self.Rm)
+        running_log(f"转移成功 {self.Rm.selected_version}>>>{self.version}")
 
     def scan_tasks(self) -> str:
-        running_log("尝试扫描tasks", self.Rm)
+        running_log(f"尝试扫描 {self.Rm.selected_version} 的tasks")
         self.tasks_dict = {}
 
         tasks_folder_path = os.path.join(self.folder_path, 'tasks')
@@ -234,7 +238,7 @@ class rpy_version:
             running_log(f"任务文件夹 {tasks_folder_path} 不存在")
             return 'no_such_tasks'
         task_file_names = os.listdir(tasks_folder_path)
-        running_log(f"扫描tasks {task_file_names}", self.Rm)
+        running_log(f"扫描tasks {task_file_names}")
         for task_file_name in task_file_names:
             task_name, task_hex = task_file_name[:-5].split('@')
             task_obj = rpy_translation_task(os.path.join(tasks_folder_path, task_file_name), self.Rm)

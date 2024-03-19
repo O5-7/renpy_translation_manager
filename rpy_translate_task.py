@@ -88,7 +88,7 @@ class rpy_translation_task:
         return rpy_task_control
 
     def read(self):
-        running_log(f"读取task {self.file_path}", self.Rm)
+        running_log(f"读取task {self.Rm.selected_version}>>>{self.file_path}")
         with open(self.file_path, mode='r', encoding='utf-8') as F:
             read_json = json.load(F)
             self.host_name = read_json['host_name']
@@ -113,7 +113,7 @@ class rpy_translation_task:
         self.control = self.build_control()
 
     def write(self):
-        running_log(f"写任务 {self.description} 到 {self.file_path}", self.Rm)
+        running_log(f"写任务 {self.Rm.selected_version}>>>{self.description} 到 {self.file_path}")
         with open(self.file_path, mode='w', encoding='utf-8') as F:
             task_json = {
                 "host_name": self.host_name,
@@ -129,7 +129,7 @@ class rpy_translation_task:
             F.write(json.dumps(task_json, indent=2, ensure_ascii=False))
 
     def show_task_editor(self, _):
-        running_log(f"打开task {self.description}", self.Rm)
+        running_log(f"打开task {self.Rm.selected_version}>>>{self.description}")
         self.Rm.selected_task = self.hex
         self.Rm.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.Rm.selected_version} >> {self.description}"
         self.Rm.page.controls[0].controls[1].content.content.update()

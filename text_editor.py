@@ -116,7 +116,7 @@ class text_editor:
 
     def translate_self(self, _):
         query = self.control.content.controls[1].value
-        running_log(f"在线翻译 {query[:20]}", self.Rm)
+        running_log(f"在线翻译 {query[:20]}")
         target = ""
 
         free_target = self.translate_free(query)
@@ -167,7 +167,7 @@ class text_editor:
         self.task_obj.task_result[self.file_name][self.event_name].update({self.dialogue: new_translation})
 
     def translate_cost(self, query):
-        running_log(f"百度翻译", self.Rm)
+        running_log(f"百度翻译")
         appid = self.Rm.app_config["appid"]
         appkey = self.Rm.app_config["appkey"]
 
@@ -197,7 +197,7 @@ class text_editor:
         return target
 
     def translate_free(self, query):
-        running_log(f"彩云翻译", self.Rm)
+        running_log(f"彩云翻译")
         url = "https://api.interpreter.caiyunai.com/v1/translator"
 
         token = "3975l6lr5pcbvidl6jl2"

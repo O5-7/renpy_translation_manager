@@ -95,7 +95,7 @@ class RPY_manager(ft.UserControl):
                 running_log(f"{path} 不是一个文件夹或不存在")
                 return
             name = Column_controls[1].value
-            running_log(f"添加version {name}", self)
+            running_log(f"添加version {name} {path}")
             self.version_list.update({name: rpy_version(path, name, self), })
             self.version_list = {k: self.version_list[k] for k in sorted(self.version_list, reverse=True)}
             update_version_UI_list(None)
@@ -592,7 +592,7 @@ class RPY_manager(ft.UserControl):
                                     }
                                 ),
                                 offset=(0, 1),
-                                tooltip="转移翻译",
+                                tooltip="版本间转移翻译",
                                 on_click=self.open_v2v_transfer_dialog
                             ),
                             ft.IconButton(
@@ -659,12 +659,12 @@ class RPY_manager(ft.UserControl):
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_FORWARD_IOS_ROUNDED,
                                             text="json到rpy",
-                                            on_click=lambda _: self.version_list[self.selected_version].json_2_rpy()
+                                            on_click=lambda _: self.version_list[self.selected_version].json_2_rpy() if self.selected_version != "" else None
                                         ),
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_BACK_IOS_ROUNDED,
                                             text="rpy到json",
-                                            on_click=lambda _: self.version_list[self.selected_version].rpy_2_json()
+                                            on_click=lambda _: self.version_list[self.selected_version].rpy_2_json() if self.selected_version != "" else None
                                         ),
                                         # ft.FilePicker()
                                     ],
@@ -883,13 +883,13 @@ class RPY_manager(ft.UserControl):
         self.page.update()
 
     def delete_version_dialog(self, _):
-        running_log(f"尝试删除version", self)
+        running_log(f"尝试删除version")
         checkbox_Column = self.version_delete_dialog.actions[0].controls[0]
         for Row in checkbox_Column.controls:
             checkbox, version_name_text, _, _ = Row.controls
             if checkbox.value:
                 version_name = version_name_text.value
-                running_log(f"删除version {version_name}", self)
+                running_log(f"删除version {version_name}")
                 del self.version_list[version_name]
 
                 if self.selected_version == version_name:
@@ -925,6 +925,9 @@ class RPY_manager(ft.UserControl):
 
     def open_add_task(self, _):
         if self.selected_version == "":
+            return
+        if not self.version_list[self.selected_version].success:
+            running_log("存在解析失败的rpy,操作不允许")
             return
         rpy_file_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls[1]
         rpy_file_dropdown.options = [ft.dropdown.Option(rpy_name) for rpy_name in self.version_list[self.selected_version].rpy_dict.keys()]
@@ -980,7 +983,7 @@ class RPY_manager(ft.UserControl):
         task_description_textfield.update()
 
     def add_modify_task(self, _):
-        running_log(f"尝试添加润色任务", self)
+        running_log(f"尝试添加润色任务")
         add_modify_task_3_dropdown = self.add_task_dialog.actions[0].content.controls[0].tabs[0].content.controls
         rpy_file_name = add_modify_task_3_dropdown[1].value
         event_name = add_modify_task_3_dropdown[2].value
@@ -997,7 +1000,7 @@ class RPY_manager(ft.UserControl):
         if any([i is None for i in [rpy_file_name, event_name, dialogue_name, description]]):
             return
 
-        running_log(f"添加润色任务 {description}", self)
+        running_log(f"成功添加润色任务 {description}")
 
         if not all([rpy_file_name, event_name, dialogue_name, description]):
             return
@@ -1047,7 +1050,7 @@ class RPY_manager(ft.UserControl):
         self.page.update()
 
     def add_update_task(self, _):
-        running_log("尝试添加更新任务", self)
+        running_log("尝试添加更新任务")
         tasks_dick = self.version_list[self.selected_version].tasks_dict
 
         task_info = self.add_task_dialog.actions[0].content.controls[0].tabs[1].content.controls[4].value
@@ -1191,7 +1194,7 @@ class RPY_manager(ft.UserControl):
         self.add_task_dialog.update()
 
     def update_task_info(self, _):
-        running_log("计算更新内容", self)
+        running_log("计算更新内容")
         add_update_task_Column = self.add_task_dialog.actions[0].content.controls[0].tabs[1].content
         old_version = add_update_task_Column.controls[1].controls[0].value
         new_version = add_update_task_Column.controls[1].controls[1].value
@@ -1274,6 +1277,9 @@ class RPY_manager(ft.UserControl):
     def open_t2j_transfer_dialog(self, _):
         if self.selected_version == "":
             return
+        if not self.version_list[self.selected_version].success:
+            running_log("存在解析失败的rpy,操作不允许")
+            return
         rpy_dict = self.version_list[self.selected_version].rpy_dict
         transfer_Column = self.t2j_transfer_dialog.actions[0].controls[0]
         transfer_Column.controls = []
@@ -1328,6 +1334,11 @@ class RPY_manager(ft.UserControl):
         self.page.update()
 
     def open_merge_task(self, _):
+        if self.selected_version == "":
+            return
+        if not self.version_list[self.selected_version].success:
+            running_log("存在解析失败的rpy,操作不允许")
+            return
         merge_Column = self.merge_tasks_dialog.actions[0].controls[0]
         merge_Column.controls = []
 
@@ -1438,7 +1449,7 @@ class RPY_manager(ft.UserControl):
 
     def transfer_task_result_to_json_file(self, _):
         check_boxes_column = self.t2j_transfer_dialog.actions[0].controls[0]
-        running_log(f"转移{len(check_boxes_column.controls)}个任务翻译到json", self)
+        running_log(f"转移{len(check_boxes_column.controls)}个任务翻译到json")
         ver_obj = self.version_list[self.selected_version]
         update_rpy_set = set()
         for row in check_boxes_column.controls:
@@ -1494,7 +1505,13 @@ class RPY_manager(ft.UserControl):
 
         if old_version_name == new_version_name or old_version_name == "" or new_version_name == "":
             return
-        running_log(f"转移翻译 {old_version_name} 到 {new_version_name}", self)
+        if not self.version_list[old_version_name].success and self.version_list[new_version_name].success:
+            if not self.version_list[old_version_name].success:
+                running_log(f"{old_version_name} 存在解析错误的rpy 禁止操作")
+            if not self.version_list[new_version_name].success:
+                running_log(f"{new_version_name} 存在解析错误的rpy 禁止操作")
+            return
+        running_log(f"版本间转移翻译 {old_version_name} 到 {new_version_name}")
         self.v2v_transfer_dialog.actions[0].controls[1].visible = False
         self.v2v_transfer_dialog.actions[0].controls[2].visible = True
         self.v2v_transfer_dialog.update()
@@ -1569,7 +1586,7 @@ class RPY_manager(ft.UserControl):
         self.main_page.update()
 
     def save_setting_config(self, _):
-        running_log("保存设置", self)
+        running_log("保存设置")
         self.app_config["user_name"] = self.setting_config_dialog.actions[0].content.controls[0].controls[1].value
         try:
             self.app_config["task_auto_save"] = int(self.setting_config_dialog.actions[0].content.controls[1].controls[1].value)

@@ -45,7 +45,7 @@ class RPY_File:
         self.control = self.build_control()
 
     def read_rpy(self):
-        running_log(f"读取rpy: {self.file_name}", self.Rm)
+        running_log(f"读取rpy: {self.file_name} <<< {self.file_path}")
         with open(self.file_path, mode='r', encoding='utf-8') as F:
             lines = F.readlines()
         clear_lines = []
@@ -161,18 +161,17 @@ class RPY_File:
                     return
 
     def read_json(self):
-        # running_log(f"读取json {self.file_name}", self.Rm)
         with open(self.file_path, mode='r', encoding='utf-8') as F:
             self.file_json = json.load(F)
 
     def write_json(self, folder_path: str):
-        running_log(f"写json {self.file_name} 在 {folder_path}", self.Rm)
+        running_log(f"写json {self.file_name} 在 {folder_path}")
         json_str = json.dumps(self.file_json, indent=2, ensure_ascii=False)
         with open(os.path.join(folder_path, self.file_json['name'] + '.json'), mode='w', encoding='utf-8') as F:
             F.write(json_str)
 
     def write_rpy(self, folder_path: str):
-        running_log(f"写rpy {self.file_name} 在 {folder_path}", self.Rm)
+        running_log(f"写rpy {self.file_name} 在 {folder_path}")
         write_str = ''
         with open(os.path.join(folder_path, self.file_json['name'] + '.rpy'), mode='w', encoding='utf-8') as F:
             for event, lines in self.file_json['dialogue'].items():
@@ -246,7 +245,7 @@ class RPY_File:
         return rpy_file_control
 
     def show_file_info(self, _):
-        running_log(f"打开rpy {self.file_name}", self.Rm)
+        running_log(f"打开rpy {self.Rm.selected_version}>>>{self.file_name}")
         self.Rm.page.controls[0].controls[1].content.content.value = f"RTM >>> {self.Rm.selected_version} >> {self.file_name}"
         self.Rm.page.controls[0].controls[1].content.content.update()
 

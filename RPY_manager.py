@@ -1,5 +1,6 @@
 import hashlib
-
+import spacy
+from nltk import Tree
 from rpy_version import rpy_version
 import flet as ft
 import time
@@ -23,6 +24,7 @@ class RPY_manager(ft.UserControl):
         self.user_name = ''
         self.name_dict = {}
         self.get_name_dict()
+        self.nlp = spacy.load('assets/en_core_web_md-3.7.1')
 
         self.temp_path = os.getcwd()
 

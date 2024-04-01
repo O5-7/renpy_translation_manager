@@ -1,13 +1,21 @@
 import random
 import re
-
+from nltk import Tree
 import flet as ft
 import os
 import json
 import hashlib
 import requests
+from difflib import Differ
 
 from running_log import running_log
+
+flag_color_dict = {
+    "-": "#daa7a7",
+    "+": "#a7daa7",
+    " ": "#eeeeee",
+    "?": "#a7a7da"
+}
 
 
 class text_editor:
@@ -15,6 +23,7 @@ class text_editor:
         super().__init__()
         self.hint = ""
         self.origin = ""
+        self.no_flag_origin = ""
         self.script = ""
         self.speaker = ""
         self.speaker_color = ""
@@ -24,12 +33,61 @@ class text_editor:
         self.task_obj = task_obj
         self.Rm = rm
         self.control = self.build_control()
+        self.is_syntax_tree = False
+        self.sents_depth_list = []
 
         try:
-            self.control.content.controls[3].controls[0].value = task_obj.task_result[self.file_name][self.event_name][self.dialogue]
+            # 读取保存在内存的翻译
+            new_translation = task_obj.task_result[self.file_name][self.event_name][self.dialogue]
+            self.control.content.controls[3].controls[0].value = new_translation
             self.control.content.controls[3].controls[0].bgcolor = "#dfe2eb"
+
+            hint_text = self.control.content.controls[2]
+            if new_translation:
+                hint_text.value = ""
+                hint_text.spans = []
+                diff_result = Differ().compare(self.hint, new_translation)
+                temp_flag = '%'
+                for res in diff_result:
+                    flag = res[0]
+                    word = res[2]
+                    if flag == temp_flag:
+                        hint_text.spans[-1].text += word
+                    else:
+                        temp_flag = flag
+                        hint_text.spans.append(
+                            ft.TextSpan(
+                                word,
+                                ft.TextStyle(
+                                    # color=flag_color_dict[flag],
+                                    decoration=ft.TextDecoration.UNDERLINE if flag != " " else None,
+                                    decoration_color=flag_color_dict[flag],
+                                    bgcolor=flag_color_dict[flag]
+                                )
+                            )
+                        )
+            else:
+                hint_text.value = self.hint
+                hint_text.spans = []
+                hint_text.update()
+
         except KeyError:
             pass
+
+        self.syntax_tree_dialog = ft.AlertDialog(
+            title=ft.Text("依存句法分析", size=20),
+            actions=[
+                ft.Container(
+                    width=1000,
+                    height=600,
+                    content=ft.Tabs(
+                        selected_index=0,
+                        animation_duration=0,
+                        tabs=[],
+                    )
+                )
+            ]
+        )
 
     def build_control(self):
         rpy_dict = self.Rm.version_list[self.Rm.selected_version].rpy_dict
@@ -58,11 +116,11 @@ class text_editor:
                 [
                     ft.Text(self.speaker, color=self.speaker_color, font_family="黑体", size=20, ),
                     ft.Text(self.origin, font_family="Hans", size=20, selectable=True),
-                    ft.Text(self.hint, font_family="Hans", size=17, selectable=True, color="#878787"),
+                    ft.Text(self.hint, font_family="Hans", size=18, selectable=True, color="#5f5f5f"),
                     ft.Row(
                         [
                             ft.TextField(
-                                width=740,
+                                width=700,
                                 on_change=self.update_in_memory,
                                 text_size=17,
                                 border=ft.InputBorder.UNDERLINE,
@@ -70,6 +128,16 @@ class text_editor:
                                 multiline=True,
                                 border_radius=0,
                                 bgcolor="#eb969f"
+                            ),
+                            ft.IconButton(
+                                icon=ft.icons.ANALYTICS_ROUNDED,
+                                style=ft.ButtonStyle(
+                                    shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=0)},
+                                    side={ft.MaterialState.DEFAULT: ft.BorderSide(1, "#000000")},
+                                ),
+                                icon_size=33,
+                                on_click=self.show_syntax_tree_dialog,
+                                tooltip="句法树解析",
                             ),
                             ft.IconButton(
                                 icon=ft.icons.RAW_ON_ROUNDED,
@@ -112,18 +180,23 @@ class text_editor:
             width=1050,
         )
 
+        self.no_flag_origin = self.origin
+        self.no_flag_origin = self.no_flag_origin.replace('{i}', '').replace('{/i}', '')
+        self.no_flag_origin = self.no_flag_origin.replace('{b}', '').replace('{/b}', '')
+        self.no_flag_origin = self.no_flag_origin.replace('{s}', '').replace('{/s}', '')
+        self.no_flag_origin = re.sub(r'{size=[-+]?\d+}', '', self.no_flag_origin).replace('{/size}', '')
+
         return control
 
     def translate_self(self, _):
-        query = self.control.content.controls[1].value
-        running_log(f"在线翻译 {query[:20]}")
+        running_log(f"在线翻译 {self.origin[:20]}")
         target = ""
 
-        free_target = self.translate_free(query)
+        free_target = self.translate_free(self.no_flag_origin)
         if "target" in free_target.keys():
             target = free_target["target"]
         else:
-            cost_target = self.translate_cost(query)
+            cost_target = self.translate_cost(self.no_flag_origin)
             if "trans_result" in cost_target.keys():
                 target = cost_target["trans_result"][0]["dst"]
             else:
@@ -156,6 +229,37 @@ class text_editor:
         text_field.bgcolor = "#eb969f" if new_translation == "" else "#dfe2eb"
         text_field.update()
 
+        if self.hint:
+            hint_text: ft.Text
+            hint_text = self.control.content.controls[2]
+            if new_translation:
+                hint_text.value = ""
+                hint_text.spans = []
+                diff_result = Differ().compare(self.hint, new_translation)
+                temp_flag = '%'
+                for res in diff_result:
+                    flag = res[0]
+                    word = res[2]
+                    if flag == temp_flag:
+                        hint_text.spans[-1].text += word
+                    else:
+                        temp_flag = flag
+                        hint_text.spans.append(
+                            ft.TextSpan(
+                                word,
+                                ft.TextStyle(
+                                    # color=flag_color_dict[flag],
+                                    decoration=ft.TextDecoration.UNDERLINE if flag != " " else None,
+                                    decoration_color=flag_color_dict[flag],
+                                    bgcolor=flag_color_dict[flag],
+                                )
+                            )
+                        )
+            else:
+                hint_text.value = self.hint
+                hint_text.spans = []
+            hint_text.update()
+
         # self.task_obj.task_result.update({self.dialogue: [self.file_name, self.event_name, new_translation]}) # 可能会有歧义冲突
         if self.file_name not in self.task_obj.task_result.keys():
             self.task_obj.task_result.update({self.file_name: {}})
@@ -180,11 +284,6 @@ class text_editor:
         endpoint = 'https://api.fanyi.baidu.com'
         path = '/api/trans/vip/translate'
         url = endpoint + path
-
-        query = query.replace('{i}', '').replace('{/i}', '')
-        query = query.replace('{b}', '').replace('{/b}', '')
-        query = query.replace('{s}', '').replace('{/s}', '')
-        query = re.sub(r'{size=[-+]?\d+}', '', query).replace('{/size}', '')
 
         salt = random.randint(32768, 65536)
         sign = hashlib.md5((appid + query + str(salt) + appkey).encode("utf-8")).hexdigest()
@@ -217,3 +316,88 @@ class text_editor:
         response = requests.request("POST", url, data=json.dumps(payload), headers=headers)
 
         return json.loads(response.text)
+
+    def show_syntax_tree_dialog(self, _):
+        if not self.is_syntax_tree:
+            def to_nltk_tree(node):
+                if node.n_lefts + node.n_rights > 0:
+                    return Tree(node.orth_, [to_nltk_tree(child) for child in node.children])
+                else:
+                    return node.orth_
+
+            def rebuild(node: Tree, depth: int = 0):
+                out = [[node.label(), depth]]
+                for n in node:
+                    if type(n) == str:
+                        out.append([n, depth])
+                    else:
+                        out += rebuild(n, depth + 1)
+                return out
+
+            doc = self.Rm.nlp(self.no_flag_origin)
+
+            origin = [token.text for token in doc]
+            for sent in doc.sents:
+                depth_l = rebuild(to_nltk_tree(sent.root))
+                out_list = [(world, -1) for world in origin[:len(depth_l)]]
+
+                for world, depth in depth_l:
+                    for num, (world_o, depth_o) in enumerate(out_list):
+                        if depth_o > -1:
+                            continue
+                        if world == world_o:
+                            out_list[num] = (world, depth)
+                            break
+                self.sents_depth_list.append(out_list)
+                origin = origin[len(depth_l):]
+            tabs_list = self.syntax_tree_dialog.actions[0].content.tabs
+            for num, sent_depth in enumerate(self.sents_depth_list):
+                tab = ft.Tab(
+                    text=f"第{num + 1}句",
+                    content=ft.Column(
+                        [
+                            ft.Slider(min=0, max=10, divisions=10, label="深度={value}", value=0, on_change=self.depth_change),
+                            ft.Row(
+                                width=980,
+                                height=470,
+                                scroll=ft.ScrollMode.ALWAYS,
+                                vertical_alignment=ft.CrossAxisAlignment.START,
+                                spacing=0,
+                            )
+                        ]
+                    )
+                )
+                row_list = tab.content.controls[1].controls
+                for world, depth in sent_depth:
+                    row_list.append(
+                        ft.Column(
+                            [
+                                ft.Container(
+                                    height=40 * depth,
+                                    width=3,
+                                    bgcolor="#e0e0e0",
+                                    animate_size=200,
+                                ),
+                                ft.Container(
+                                    ft.Text(world + ' ', size=35, ),
+                                    border_radius=1,
+                                ),
+                                ft.Container(height=10)
+                            ],
+                            horizontal_alignment=ft.CrossAxisAlignment.START,
+                            spacing=0)
+                    )
+                tabs_list.append(tab)
+
+        self.is_syntax_tree = True
+        self.Rm.page.dialog = self.syntax_tree_dialog
+        self.syntax_tree_dialog.open = True
+        self.Rm.page.update()
+
+    def depth_change(self, e):
+        value = int(e.control.value)
+        sent_index = self.syntax_tree_dialog.actions[0].content.selected_index
+        tab_s = self.syntax_tree_dialog.actions[0].content.tabs[sent_index]
+        for i in range(len(self.sents_depth_list[sent_index])):
+            tab_s.content.controls[1].controls[i].controls[0].height = 40 * min(self.sents_depth_list[sent_index][i][1], value)
+        tab_s.update()

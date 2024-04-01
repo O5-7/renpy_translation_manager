@@ -1,2 +1,4 @@
 flet
 requests
+spacy
+nltk

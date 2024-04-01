@@ -3,6 +3,15 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/build" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/attribute_ruler" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/lemmatizer" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/ner" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/parser" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/senter" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/tagger" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/tok2vec" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1/vocab" />
+      <excludeFolder url="file://$MODULE_DIR$/assets/en_core_web_md-3.7.1" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.9 (base) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

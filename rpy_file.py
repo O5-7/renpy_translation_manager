@@ -1,9 +1,20 @@
 import os
 import json
+import re
+
 import flet as ft
 from running_log import running_log
 
 line_height = 21
+
+
+def remove_flag(input_: str):
+    input_ = input_.replace('{i}', '').replace('{/i}', '')
+    input_ = input_.replace('{b}', '').replace('{/b}', '')
+    input_ = input_.replace('{s}', '').replace('{/s}', '')
+    input_ = input_ = re.sub(r'{size=[-+]?\d+}', '', input_).replace('{/size}', '')
+    input_ = input_ = re.sub(r'{lore=.*?}', '', input_).replace('{/lore}', '')
+    return input_
 
 
 class RPY_File:
@@ -170,7 +181,7 @@ class RPY_File:
         with open(os.path.join(folder_path, self.file_json['name'] + '.json'), mode='w', encoding='utf-8') as F:
             F.write(json_str)
 
-    def write_rpy(self, folder_path: str):
+    def write_rpy(self, folder_path: str, duel_language):
         running_log(f"写rpy {self.file_name} 在 {folder_path}")
         write_str = ''
         with open(os.path.join(folder_path, self.file_json['name'] + '.rpy'), mode='w', encoding='utf-8') as F:
@@ -183,7 +194,8 @@ class RPY_File:
                         dialogue_hex=dialogue_hex,
                         speaker='' if line['speaker'] == '<>' else '{} '.format(line['speaker']),
                         origin=line['origin'],
-                        translation=line['translation']
+                        # translation=line['translation'] if not duel_language else line['origin'] + r'\n' + line['translation']
+                        translation=line['translation'] if not duel_language else line['translation'] + "{size=*0.5}{lore=" + remove_flag(line['origin']) + "}" + "原文" + "{/lore}{/size}"
                     )
                     write_str += line
             for strings in self.file_json['strings']:

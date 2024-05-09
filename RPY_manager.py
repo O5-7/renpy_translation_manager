@@ -137,6 +137,10 @@ class RPY_manager(ft.UserControl):
             self.merge_tasks_dialog.open = False
             self.merge_tasks_dialog.update()
 
+        def close_change_language_dialog(_):
+            self.change_language_dialog.open = False
+            self.change_language_dialog.update()
+
         self.page.overlay.append(self.file_picker)
         # version文件夹选择dialog
         self.version_add_dialog = ft.AlertDialog(
@@ -169,7 +173,8 @@ class RPY_manager(ft.UserControl):
                                 [
                                     ft.TextButton("添加", icon=ft.icons.CHECK_ROUNDED, on_click=add_version),
                                     ft.TextButton("取消", icon=ft.icons.CANCEL_ROUNDED, icon_color="#ba1a1a", on_click=close_version_add_dialog)
-                                ]
+                                ],
+                                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                             )
                         ]
                     ),
@@ -203,7 +208,8 @@ class RPY_manager(ft.UserControl):
                                     text="取消",
                                     on_click=close_version_delete_dialog
                                 ),
-                            ]
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                         )
 
                     ]
@@ -487,6 +493,41 @@ class RPY_manager(ft.UserControl):
             ]
         )
 
+        self.change_language_dialog = ft.AlertDialog(
+            title=ft.Text("修改Language标签", size=20),
+            modal=True,
+            actions=[
+                ft.Column(
+                    [
+                        ft.TextField(),
+                        ft.ProgressBar(
+                            value=0,
+                            width=490,
+                            height=10,
+                        ),
+                        ft.Row(
+                            [
+                                ft.TextButton(
+                                    icon=ft.icons.CHANGE_CIRCLE_OUTLINED,
+                                    text="修改",
+                                    on_click=lambda _:self.version_list[self.selected_version].change_language(self.change_language_dialog.actions[0].controls[0].value, self.change_language_dialog.actions[0].controls[1]) if self.selected_version else None
+                                ),
+                                ft.TextButton(
+                                    icon=ft.icons.CANCEL_ROUNDED,
+                                    icon_color="#FF0000",
+                                    text="取消",
+                                    on_click=close_change_language_dialog
+                                )
+                            ],
+                            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                        )
+                    ],
+                    height=120,
+                    width=500,
+                )
+            ]
+        )
+
     def close_app(self, _):
         running_log("关闭")
         self.page.controls[1].save_app_config()
@@ -529,6 +570,17 @@ class RPY_manager(ft.UserControl):
                             ),
                             on_click=lambda _: os.system(f"notepad {os.path.join(self.temp_path, 'out.log')}") if os.path.isfile(os.path.join(self.temp_path, 'out.log')) else lambda _: None,
                             tooltip="打开运行日志"
+                        ),
+                        ft.IconButton(
+                            icon=ft.icons.WEB_ROUNDED,
+                            icon_color="#eb9da5",
+                            icon_size=34,
+                            style=ft.ButtonStyle(
+                                shape={ft.MaterialState.DEFAULT: ft.RoundedRectangleBorder(radius=5)},
+                                bgcolor={ft.MaterialState.DEFAULT: "#71363c"},
+                            ),
+                            on_click=lambda _: os.system(f"start https://www.lessonsinlove.wiki"),
+                            tooltip="LIL wiki"
                         ),
                     ],
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER
@@ -657,11 +709,21 @@ class RPY_manager(ft.UserControl):
                                             on_click=lambda _: os.system(f"explorer {self.version_list[self.selected_version].folder_path if self.selected_version != '' else ''}"),
                                             text="打开文件夹",
                                         ),
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.LANGUAGE_ROUNDED,
+                                            on_click=self.open_change_language_dialog,
+                                            text="修改Language",
+                                        ),
                                         ft.PopupMenuItem(),
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_FORWARD_IOS_ROUNDED,
-                                            text="json到rpy",
+                                            text="json到rpy(单中文)",
                                             on_click=lambda _: self.version_list[self.selected_version].json_2_rpy() if self.selected_version != "" else None
+                                        ),
+                                        ft.PopupMenuItem(
+                                            icon=ft.icons.ARROW_FORWARD_IOS_ROUNDED,
+                                            text="json到rpy(双语)",
+                                            on_click=lambda _: self.version_list[self.selected_version].json_2_rpy(True) if self.selected_version != "" else None
                                         ),
                                         ft.PopupMenuItem(
                                             icon=ft.icons.ARROW_BACK_IOS_ROUNDED,
@@ -1586,6 +1648,16 @@ class RPY_manager(ft.UserControl):
             version_obj.update_control()
         self.update_version_UI_list(None)
         self.main_page.update()
+
+    def open_change_language_dialog(self, _):
+        self.change_language_dialog.actions[0].controls[0].value = list(self.version_list[self.selected_version].rpy_dict.values())[0].file_json["language"]
+        self.page.dialog = self.change_language_dialog
+        self.change_language_dialog.open = True
+        self.page.update()
+
+    def close_change_language_dialog(self, _):
+        self.change_language_dialog.open = False
+        self.change_language_dialog.update()
 
     def save_setting_config(self, _):
         running_log("保存设置")

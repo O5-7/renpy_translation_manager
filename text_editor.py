@@ -186,6 +186,7 @@ class text_editor:
         self.no_flag_origin = self.no_flag_origin.replace('{s}', '').replace('{/s}', '')
         self.no_flag_origin = re.sub(r'{size=[-+]?\d+}', '', self.no_flag_origin).replace('{/size}', '')
 
+
         return control
 
     def translate_self(self, _):

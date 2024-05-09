@@ -180,7 +180,7 @@ class rpy_version:
         r2j_dialog.open = True
         self.Rm.page.update()
 
-        self.read_rpy_by_rpy(r2j_dialog.actions[0].controls[1])
+        self.read_rpy_by_rpy(pb=r2j_dialog.actions[0].controls[1])
         for rpy_num, rpy_obj in enumerate(self.rpy_dict.values()):
             r2j_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
             r2j_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)
@@ -195,7 +195,7 @@ class rpy_version:
 
         running_log(f"转移成功 {self.version}")
 
-    def json_2_rpy(self):
+    def json_2_rpy(self, duel_language: bool = False):
         running_log(f"json转移到rpy {self.version}")
         if not self.success:
             running_log("存在解析失败的rpy,操作不允许")
@@ -219,10 +219,10 @@ class rpy_version:
 
         self.read_rpy_by_json(j2r_dialog.actions[0].controls[1])
         for rpy_num, rpy_obj in enumerate(self.rpy_dict.values()):
-            j2r_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(20) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
+            j2r_dialog.actions[0].controls[0].value = rpy_obj.file_name.ljust(40) + f"{(rpy_num + 1)}/{len(self.rpy_dict)}"
             j2r_dialog.actions[0].controls[1].value = (rpy_num + 1) / len(self.rpy_dict)
             j2r_dialog.update()
-            rpy_obj.write_rpy(self.folder_path)
+            rpy_obj.write_rpy(self.folder_path, duel_language)
 
         j2r_dialog.open = False
         self.Rm.page.update()
@@ -274,3 +274,17 @@ class rpy_version:
 
             self.tasks_dict.update({task_hex: task_obj})
         return 'success'
+
+    def change_language(self, new_language: str, pb: ft.ProgressBar = None):
+        running_log(f"尝试修改 {self.version} 的Language标签为 {new_language}")
+        if not new_language:
+            return
+        if new_language == list(self.rpy_dict.values())[0].file_json["language"]:
+            return
+        running_log("开始修改并保存")
+        for num, r_file in enumerate(self.rpy_dict.values()):
+            r_file.file_json["language"] = new_language
+            r_file.write_json(self.folder_path)
+            pb.value = float(num) / len(self.rpy_dict)
+            pb.update()
+        self.Rm.close_change_language_dialog(None)

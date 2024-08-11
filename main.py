@@ -9,8 +9,8 @@ from renpy_tool import *
 
 def main(page: ft.Page):
     running_log("启动 RPY_manager")
-    page.window_title_bar_hidden = True
-    page.window_title_bar_buttons_hidden = True
+    page.window.title_bar_hidden = True
+    page.window.title_bar_buttons_hidden = True
 
     def minimize(_):
         page.window_minimized = True
@@ -19,7 +19,7 @@ def main(page: ft.Page):
     def close_app(_):
         running_log("关闭")
         page.controls[1].save_app_config()
-        page.window_close()
+        page.window.close()
 
     def egg(_):
         title = page.controls[0].controls[1].content.content
@@ -90,11 +90,11 @@ def main(page: ft.Page):
     page.bgcolor = "#2b2b2b"
 
     page.theme_mode = ft.ThemeMode.LIGHT
-    page.window_width = 1500
-    page.window_height = 965
+    page.window.width = 1500
+    page.window.height = 965
 
-    page.window_resizable = False
-    page.window_center()
+    page.window.resizable = False
+    page.window.center()
 
     page.controls[1].load_config()
     page.update()

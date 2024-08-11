@@ -6,7 +6,7 @@ import threading
 import time
 
 import flet as ft
-from running_log import running_log
+from renpy_tool import *
 
 info = list("word,phonetic,definition,translation,pos,collins,oxford,tag,bnc,frq,exchange,detail,audio".split(","))
 

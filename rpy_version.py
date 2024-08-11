@@ -5,7 +5,7 @@ import datetime
 import json
 from rpy_translate_task import rpy_translation_task, date_format
 import hashlib
-from running_log import running_log
+from renpy_tool import *
 
 
 class rpy_version:

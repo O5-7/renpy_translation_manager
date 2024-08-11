@@ -8,7 +8,7 @@ import datetime
 import json
 import os
 from rpy_translate_task import date_format, rpy_translation_task
-from running_log import running_log
+from renpy_tool import *
 
 
 class RPY_manager(ft.UserControl):
@@ -27,6 +27,7 @@ class RPY_manager(ft.UserControl):
         self.nlp = spacy.load('assets/en_core_web_md-3.7.1')
 
         self.temp_path = os.getcwd()
+
 
         def filepicker_path_to_version_dialog(e: ft.FilePickerResultEvent):
             if e.path is None:
@@ -1600,7 +1601,9 @@ class RPY_manager(ft.UserControl):
                             if dialogue_hex in self.version_list[new_version_name].rpy_dict[rpy_name].file_json["dialogue"][event_name].keys():  # 是否包含对话
                                 target_dialogue = self.version_list[new_version_name].rpy_dict[rpy_name].file_json["dialogue"][event_name][dialogue_hex]
                                 if is_cover or target_dialogue["translation"] == "":
-                                    target_dialogue.update({"translation": dialogue["translation"]})
+                                    # 移除原文lore
+                                    # target_dialogue.update({"translation": dialogue["translation"]})
+                                    target_dialogue.update({"translation": remove_origin_lore(dialogue["translation"])})
 
                 for old_strings in old_rpy_obj.file_json['strings']:
                     for old_string in old_strings:

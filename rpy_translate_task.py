@@ -5,7 +5,7 @@ import flet as ft
 import json
 import datetime
 
-from running_log import running_log
+from renpy_tool import *
 from text_editor import text_editor
 from English_dict import En_dict
 

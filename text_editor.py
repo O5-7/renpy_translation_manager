@@ -8,7 +8,7 @@ import hashlib
 import requests
 from difflib import Differ
 
-from running_log import running_log
+from renpy_tool import *
 
 flag_color_dict = {
     "-": "#daa7a7",

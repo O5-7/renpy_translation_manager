@@ -4,7 +4,7 @@ import time
 
 from RPY_manager import RPY_manager
 import flet as ft
-from running_log import running_log
+from renpy_tool import *
 
 
 def main(page: ft.Page):

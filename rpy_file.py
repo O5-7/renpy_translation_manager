@@ -3,18 +3,9 @@ import json
 import re
 
 import flet as ft
-from running_log import running_log
+from renpy_tool import *
 
 line_height = 21
-
-
-def remove_flag(input_: str):
-    input_ = input_.replace('{i}', '').replace('{/i}', '')
-    input_ = input_.replace('{b}', '').replace('{/b}', '')
-    input_ = input_.replace('{s}', '').replace('{/s}', '')
-    input_ = input_ = re.sub(r'{size=[-+]?\d+}', '', input_).replace('{/size}', '')
-    input_ = input_ = re.sub(r'{lore=.*?}', '', input_).replace('{/lore}', '')
-    return input_
 
 
 class RPY_File:
@@ -187,7 +178,8 @@ class RPY_File:
         with open(os.path.join(folder_path, self.file_json['name'] + '.rpy'), mode='w', encoding='utf-8') as F:
             for event, lines in self.file_json['dialogue'].items():
                 for dialogue_hex, line in lines.items():
-                    line = """# {script}\ntranslate {language} {event}_{dialogue_hex}:\n\n    # {speaker}"{origin}"\n    {speaker}"{translation}"\n\n""".format(
+                    remove_origin_tl = remove_origin_lore(line['translation'])
+                    out_line = """# {script}\ntranslate {language} {event}_{dialogue_hex}:\n\n    # {speaker}"{origin}"\n    {speaker}"{translation}"\n\n""".format(
                         script=line['script'],
                         language=self.file_json['language'],
                         event=event,
@@ -195,9 +187,10 @@ class RPY_File:
                         speaker='' if line['speaker'] == '<>' else '{} '.format(line['speaker']),
                         origin=line['origin'],
                         # translation=line['translation'] if not duel_language else line['origin'] + r'\n' + line['translation']
-                        translation=line['translation'] if not duel_language else line['translation'] + "{size=*0.5}{lore=" + remove_flag(line['origin']) + "}" + "原文" + "{/lore}{/size}"
+                        # 生成翻译时移除已有的原文lore
+                        translation=remove_origin_tl if not duel_language else remove_origin_tl + "{size=*0.5}{lore=" + remove_flag(line['origin']) + "}" + "原文" + "{/lore}{/size}"
                     )
-                    write_str += line
+                    write_str += out_line
             for strings in self.file_json['strings']:
                 write_str += 'translate {} strings:\n\n'.format(self.file_json['language'])
                 for string in strings:

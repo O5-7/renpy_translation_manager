@@ -26,9 +26,9 @@ def remove_flag(input_: str):
     input_ = input_.replace('{s}', '').replace('{/s}', '')
     input_ = input_.replace('[', '').replace(']', '')
 
-    input_ = input_ = re.sub(r'{size=[-+]?\d+}', '', input_).replace('{/size}', '')
-    input_ = input_ = re.sub(r'{lore=.*?}', '', input_).replace('{/lore}', '')
-    input_ = input_.replace('{rb}', '').replace('{/rb}', '')
-    input_ = input_ = re.sub(r'{rt}.*?{/rt}', '', input_).replace('{/lore}', '')
+    input_ = re.sub(r'{size=[-+]?\d+}', '', input_).replace('{/size}', '')
+    input_ = re.sub(r'{lore=.*?}', '', input_).replace('{/lore}', '')
+    input_.replace('{rb}', '').replace('{/rb}', '')
+    input_ = re.sub(r'{rt}.*?{/rt}', '', input_).replace('{/lore}', '')
 
     return input_
